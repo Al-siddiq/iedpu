@@ -227,7 +227,7 @@ The Committee should be able to:
 - Suspend or revoke access.
 - Review the responsibilities attached to each role.
 
-Portal roles shall be predefined in the system, with an expandable catalogue of additional roles and permissions.
+Portal role profiles shall be created, configured, deactivated and assigned by authorised administrators through the portal, using only the predefined, release-controlled catalogue of executable permissions. No role name or role ID shall be hardcoded into business logic.
 
 The Committee should not need to request software redevelopment whenever it wants to assign an existing administrative responsibility to another person.
 
@@ -240,6 +240,26 @@ For example, the Membership Verification Officer may review and approve pending 
 The Financial Records Officer may view authorised financial information and manage assigned payment records but should not automatically be able to modify membership verification decisions.
 
 This approach will provide flexibility without sacrificing accountability.
+
+## 9.5 Engineering clarification — administrator-managed organisational data
+
+**Project commencement:** The project owner confirms the project is commissioned and development may commence. P0 reconciles engineering decisions; it is not a second permission-to-develop gate. Feature-specific constitutional, privacy and financial activation restrictions still apply.
+
+**Organisation:** Authorised Committee administrators manage zone reference records, approved project coverage, branches, office types, Branch Chairmen and other office holders through protected interfaces. No branch name, zone name, Chairman identity or portal role profile is compiled as immutable business data. Northern Zone remains the approved operational scope; reference data for other zones does not extend that mandate.
+
+**Branches:** The historic constitutional branch schedule is optional reference material, not a mandatory import or automatically active directory. New branches default to pending recognition and inactive. The **Committee Super Administrator may activate a branch directly** after recognition/location validation, with reason/reference and an audit event; no second approver is required for routine branch activation.
+
+**Office holders:** An office-holder name and term may be recorded before a canonical member or account exists. Such an unlinked record is informational and cannot authenticate or verify members. Later account/member linking and separately approved scoped portal roles are required for executable access.
+
+**Roles:** Administrators may create, update, deactivate and assign role profiles and permission bundles from the developer-maintained executable permission catalogue, within protected grant ceilings. They cannot invent backend permission keys, self-elevate or derive portal privileges from an official title.
+
+**Separation of duties:** The Committee Super Administrator handles operational records and approvals. A separate developer interface handles deployments, configuration, backups, migrations, security diagnostics and specialist technical work. Developers are IEDPU members and may also receive independently authorised organisational roles, but technical access does not confer Committee authority.
+
+**Registration/privacy approval:** The **Committee Super Administrator** approves versioned registration rules and privacy notices before live use. Approval does not displace lawful-basis, controller, retention or other privacy obligations.
+
+**Activation holds:** Final registration fields, live personal-data processing, official member numbers, payment providers, official digital IDs and external messaging remain gated by their relevant authorities. These holds do not block unrelated P1 coding.
+
+See `docs/implementation/P0/Engineering_Decision_Register.md` for binding decisions and activation holds.
 
 # PART FOUR: MEMBERSHIP MANAGEMENT
 

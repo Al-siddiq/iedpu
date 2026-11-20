@@ -253,9 +253,10 @@ erDiagram
 
 ## 4.1 `org_zones`
 
-Stores recognised IEDPU zones. Seed Central, Northern, Western and
-South-South Zones from the Constitution. Only Northern Zone is in this
-initiative's operational scope.
+Stores recognised IEDPU zones as administrator-maintained records.
+Do not hardcode or mandatory-seed zone names; authorised administrators
+enter/confirm records from approved constitutional references. Only
+Northern Zone is in this initiative's operational scope.
 
   -------------------------------------------------------------------------------------
   Field                Type                        Null Key / rule    Meaning
@@ -346,9 +347,10 @@ Stores the 19 Northern States and FCT approved for this initiative.
   `created_at`            DATETIME(6)                   No                   Creation
   -----------------------------------------------------------------------------------------
 
-UNIQUE (`state_id`, `zone_id`). Seed exactly the approved 19 Northern
-States and FCT. A geographic state record does not create a state
-coordinator role.
+UNIQUE (`state_id`, `zone_id`). The approved 19 Northern States and FCT
+are maintained as authorised project coverage records through an admin
+interface or reviewed import, not fixed code or mandatory seeds. A
+geographic state record does not create a state coordinator role.
 
 ## 4.4 `branches`
 
@@ -413,9 +415,9 @@ LGA fields are geographical attributes, not organisational layers.
 
 **Rules:** Each branch belongs to one zone. A branch must not be
 activated merely because it appears in the Constitution's First
-Schedule. Import the Northern Zone schedule names as a reference
-baseline and validate current name, state, recognition and operational
-status with the appropriate authority. Preserve source spelling in
+Schedule. Treat the Northern Zone schedule names as optional historical reference
+material for manual admin entry or a reviewed import; validate current
+name, state, recognition and operational status with the appropriate authority. Preserve source spelling in
 `source_name`. The Constitution's figure of 128 branches refers to the
 Union's total, not the Northern Zone alone.
 
@@ -751,9 +753,10 @@ cannot elevate themselves.
   `created_at`             DATETIME(6)                   No               Creation
   --------------------------------------------------------------------------------------
 
-Seed offices supported by the Constitution and approved organisational
-records. National offices may exist as reference data without making
-national administration part of the North Zone project.
+Authorised administrators maintain office types through the portal,
+using the Constitution and approved organisational records as reference.
+Do not hardcode office types or holder names. National offices may exist
+as reference data without making national administration part of this project.
 
 ## 6.7 `official_office_assignments`
 
@@ -765,8 +768,10 @@ national administration part of the North Zone project.
 
   `public_id`               CHAR(36)                      No UNIQUE                         Reference
 
-  `member_id`               BIGINT                        No FK → `members.id`              Office holder
+  `member_id`               BIGINT                       Yes FK → `members.id`              Linked member (optional)
                             UNSIGNED                                                        
+
+  `holder_name_snapshot`    VARCHAR(180)                  No                                Holder name at appointment
 
   `office_id`               BIGINT                        No FK →                           Office
                             UNSIGNED                         `official_office_catalog.id`   
@@ -805,7 +810,12 @@ national administration part of the North Zone project.
 A branch office requires a branch; a zonal office requires a zone; a
 national office has neither. Prevent overlapping current holders for the
 same office and scope through a transaction and application validation.
-Official office assignment does not create a portal role.
+Official office assignment does not create a portal role. `member_id`
+may remain NULL until the recorded office holder is linked to a canonical
+member record; `holder_name_snapshot` is required even after linking,
+so historical appointment names remain auditable. Unlinked office holders
+are informational only and cannot sign in, verify members or receive
+implicit privileges. Linkage requires a reviewed, audited action.
 
 ------------------------------------------------------------------------
 
@@ -3874,24 +3884,27 @@ assuming auto-increment IDs match across environments.
 
 ## 25.1 Zones
 
-Seed the four recognised zones: Central, Northern, Western and
-South-South. Mark only Northern Zone as in scope for this initiative.
+Do not seed immutable zone records. An authorised administrator
+creates or confirms recognised zones from the Constitution through the
+protected interface. Northern Zone alone may be designated in project
+operational scope, without assuming any fixed database ID.
 
 ## 25.2 Geography
 
-Seed the approved 19 Northern States and FCT into
-`project_coverage_states`. Confirm the exact approved list before
-production.
+Maintain the approved 19 Northern States and FCT in
+`project_coverage_states` as reviewable, administrator-managed reference
+data. Geographic lookup data may be imported, but no coverage row is
+implicitly activated by a fixed code seed.
 
 ## 25.3 Branch directory
 
-Use the Northern Zone First Schedule list in the Constitution as a
-source baseline, not as proof every branch is currently active. Import
-source names into `branches.source_name`, initially set
-`recognition_status='pending_confirmation'`, validate
-spelling/location/recognition/status, record approval references and
-activate only confirmed branches. Do not silently correct source
-spellings.
+The Northern Zone First Schedule list is historical source reference,
+not a mandatory branch seed. Branches are entered through an authorised
+admin interface; a reviewed optional import may preserve historical names
+in `branches.source_name`. New/imported branches default to
+`recognition_status='pending_confirmation'` and inactive. Record
+recognition evidence, confirm current details and activate only after
+authorised review. Do not silently correct source spellings.
 
 
 ## 25.3.1 Northern Zone branch names in the Constitution's First Schedule
@@ -3951,13 +3964,12 @@ source wording.
 
 ## 25.5 Portal roles
 
-Seed only the minimum approved first-release roles, such as Initiative
-Committee Super Administrator, Committee Administrator, Membership
-Verification Officer, Branch Registration Administrator, Financial
-Records Officer, Announcement Administrator, Branch Reporting Officer,
-Enumerator, Member and Technical Administrator. These are software
-roles, not constitutional offices. Final role names and permission
-bundles require approval.
+Do not seed fixed user-facing portal role profiles. Authorised
+administrators create and maintain role names, permission bundles and
+assignments through the protected UI; example role titles in the SRS are
+illustrative. Application permission *keys* remain predefined and
+release-controlled through migrations. Protected privileges and grant
+ceilings are enforced by permission metadata, not by hardcoded role names.
 
 ## 25.6 Financial obligation types
 
@@ -3965,6 +3977,18 @@ Seed category labels only. Do not seed a universal amount or automatic
 schedule.
 
 ------------------------------------------------------------------------
+
+## 25.7 Engineering clarification — no fixed organisational or role seed records
+
+The Constitution and §25 source data provide reference baselines, not a requirement to compile or mandatory-seed zone, branch, office-holder or portal role *records*. Authorised administrators create and approve these through protected interfaces. Optional reviewed imports must never auto-activate a branch or grant privileges. Executable permission *keys*, protected grant ceilings, allowed statuses, constraints and geographic validation remain application-controlled.
+
+The `official_office_assignments` schema in §6.7 now permits a nullable `member_id` and requires `holder_name_snapshot VARCHAR(180)`. A name-only Chairman cannot authenticate or exercise verification privileges; later member linking and portal role assignment are separate reviewed and audited operations. P2 migrations and manual checks must reflect these constraints.
+
+**Initial setup:** One-time audited technical bootstrap, no hardcoded credentials or role IDs. Owner supplies the first Committee Super Administrator identity at P2 secure provisioning.
+
+**Authority and separation:** Committee Super Administrator may directly activate validated branches without second approval and approves registration-form/privacy-notice versions, with backend permission and audit checks. Separate developer interface handles specialist configuration, deployments, migrations, backups, diagnostics and security maintenance, without automatic business authority. Developers may also receive independently authorised IEDPU organisational roles.
+
+See `docs/implementation/P0/Engineering_Decision_Register.md`.
 
 # 26. REQUIRED DATABASE TRANSACTIONS
 
