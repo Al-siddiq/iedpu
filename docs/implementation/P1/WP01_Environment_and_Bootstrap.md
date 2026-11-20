@@ -51,9 +51,9 @@ The application config reads the base URL, timezone, HTTPS setting and database 
 
 Generate a local encryption key with:
 
-    php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
+    php -r "echo 'hex2bin:' . bin2hex(random_bytes(32)), PHP_EOL;"
 
-Store the generated value only in the local .env as encryption.key. Never paste it into GitHub or chat.
+Store the generated hex2bin-prefixed value only in the local .env as encryption.key. Never paste it into GitHub or chat.
 
 ## 5. Dependency resolution
 
