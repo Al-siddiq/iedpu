@@ -66,9 +66,9 @@ Copy only the applicable template to .env on each machine. Replace every CHANGE_
 
 Generate an encryption key locally:
 
-    php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
+    php -r "echo 'hex2bin:' . bin2hex(random_bytes(32)), PHP_EOL;"
 
-Place the generated value in the local .env as encryption.key. Never commit or share it.
+Place the generated hex2bin-prefixed value in the local .env as encryption.key. Never commit or share it.
 
 ## Database configuration
 
