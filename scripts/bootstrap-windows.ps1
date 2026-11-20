@@ -41,10 +41,11 @@ $ComposerCommand = Get-Command composer -ErrorAction SilentlyContinue
 if (-not $ComposerCommand) {
     throw "Composer was not found. Install Composer for Windows and configure it to use this XAMPP PHP executable: $PhpPath"
 }
-composer --version
-if ($LASTEXITCODE -ne 0) {
-    throw "Composer could not start."
+$ComposerVersionOutput = composer --version
+if ($LASTEXITCODE -ne 0 -or $ComposerVersionOutput -notmatch 'Composer version 2\\.') {
+    throw "Composer 2.x is required. Install/update Composer and ensure it uses the selected XAMPP PHP executable."
 }
+Write-Host $ComposerVersionOutput
 
 Write-Host "`n3/7 - Validating the manifest before lock refresh"
 composer validate --no-check-publish --no-check-lock
