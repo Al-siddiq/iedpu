@@ -53,7 +53,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "`n4/6 - Resolving and installing the approved locked dependencies"
-composer update codeigniter4/framework codeigniter4/shield --with-all-dependencies --no-interaction
+composer update codeigniter4/framework codeigniter4/shield --with-all-dependencies --no-interaction --no-scripts
 if ($LASTEXITCODE -ne 0) {
     throw "Composer dependency resolution failed. Do not deploy until this is resolved."
 }
