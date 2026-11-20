@@ -23,7 +23,7 @@ Boot::bootConsole($paths);
 try {
     $database = Config\Database::connect();
     $database->initialize();
-    $result = $database->query('SELECT 1 AS iedpu_connection_ok')->getRowArray();
+    $result = $database->query('SELECT 1 AS iedpu_connection_ok, VERSION() AS server_version')->getRowArray();
 
     if ((int) ($result['iedpu_connection_ok'] ?? 0) !== 1) {
         fwrite(STDERR, "Database connection query returned an unexpected result.\n");
@@ -32,7 +32,7 @@ try {
 
     echo "PASS: IEDPU database connection is working.\n";
     echo "Driver: " . $database->getPlatform() . "\n";
-    echo "Server version: " . $database->getVersion() . "\n";
+    echo "Server version: " . ($result['server_version'] ?? 'unknown') . "\n";
     echo "No schema or data changes were made.\n";
 } catch (Throwable $exception) {
     fwrite(STDERR, "FAIL: Database connection could not be verified.\n");
