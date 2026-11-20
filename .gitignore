@@ -40,8 +40,10 @@ $RECYCLE.BIN/
 # Environment Files
 #-------------------------
 # These should never be under version control,
-# as it poses a security risk.
+# as it poses a security risk. Keep only the reviewed example templates.
 .env
+.env.*
+!.env.*.example
 .vagrant
 Vagrantfile
 
