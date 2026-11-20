@@ -63,14 +63,14 @@ The repository's existing composer.lock predates these requirements. Do not run 
 
 - PHP preflight;
 - Composer manifest validation;
-- composer update codeigniter4/framework codeigniter4/shield --with-all-dependencies;
+- composer update --with-all-dependencies --no-interaction --no-scripts;
 - strict manifest/lock validation;
 - composer check-platform-reqs;
 - full environment check;
 - php spark --version;
 - php spark routes.
 
-The generated lockfile must be committed. The vendor/ directory remains ignored.
+The bootstrap uses --no-scripts because Shield's post-update hook only installs an optional development pre-commit hook; no runtime setup is skipped. The generated lockfile must be committed. The vendor/ directory remains ignored.
 
 ## 6. Web-root and secret protection
 
