@@ -42,7 +42,7 @@ if (-not $ComposerCommand) {
     throw "Composer was not found. Install Composer for Windows and configure it to use this XAMPP PHP executable: $PhpPath"
 }
 $ComposerVersionOutput = composer --version
-if ($LASTEXITCODE -ne 0 -or $ComposerVersionOutput -notmatch 'Composer version 2\\.') {
+if ($LASTEXITCODE -ne 0 -or $ComposerVersionOutput -notmatch 'Composer version 2\.') {
     throw "Composer 2.x is required. Install/update Composer and ensure it uses the selected XAMPP PHP executable."
 }
 Write-Host $ComposerVersionOutput
