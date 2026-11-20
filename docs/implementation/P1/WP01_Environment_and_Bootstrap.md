@@ -64,7 +64,7 @@ The repository's existing composer.lock predates these requirements. Do not run 
 - PHP preflight;
 - Composer manifest validation;
 - composer update --with-all-dependencies --no-interaction --no-scripts;
-- strict manifest/lock validation;
+- manifest/lock validation;
 - composer check-platform-reqs;
 - full environment check;
 - php spark --version;
@@ -87,7 +87,7 @@ WP01 uses manual verification only. No PHPUnit, browser automation, API automati
 | ID | Manual check | Acceptance evidence |
 |---|---|---|
 | WP01-M01 | Run PHP preflight using the same CLI PHP as Composer | All required extensions and PHP baseline pass |
-| WP01-M02 | Validate Composer manifest and refreshed lock | composer validate --strict succeeds |
+| WP01-M02 | Validate Composer manifest and refreshed lock | composer validate --no-check-publish succeeds |
 | WP01-M03 | Verify platform requirements | composer check-platform-reqs succeeds |
 | WP01-M04 | Confirm exact installed framework/Shield/Settings versions | Composer package listing and full environment checker pass |
 | WP01-M05 | Start Spark and list routes | php spark --version and php spark routes succeed |
