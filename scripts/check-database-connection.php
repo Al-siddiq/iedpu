@@ -13,6 +13,30 @@ use CodeIgniter\Boot;
 use Config\Paths;
 
 $root = dirname(__DIR__);
+
+if (! defined('FCPATH')) {
+    define('FCPATH', $root . '/public/');
+}
+
+if (! defined('ENVIRONMENT')) {
+    $environment = 'production';
+    $environmentFile = $root . '/.env';
+
+    if (is_file($environmentFile)) {
+        $contents = (string) file_get_contents($environmentFile);
+        if (preg_match('/^\\s*CI_ENVIRONMENT\\s*=\\s*([A-Za-z0-9_-]+)/m', $contents, $matches) === 1) {
+            $environment = $matches[1];
+        }
+    }
+
+    if (! in_array($environment, ['development', 'production'], true)) {
+        fwrite(STDERR, "Unsupported CI_ENVIRONMENT value for this bootstrap check.\\n");
+        exit(1);
+    }
+
+    define('ENVIRONMENT', $environment);
+}
+
 require $root . '/app/Config/Paths.php';
 
 $paths = new Paths();
