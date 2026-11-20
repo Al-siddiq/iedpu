@@ -30,7 +30,7 @@ if (! defined('ENVIRONMENT')) {
     }
 
     if (! in_array($environment, ['development', 'production'], true)) {
-        fwrite(STDERR, "Unsupported CI_ENVIRONMENT value for this bootstrap check.\\n");
+        fwrite(STDERR, "Unsupported CI_ENVIRONMENT value for this bootstrap check.\n");
         exit(1);
     }
 
