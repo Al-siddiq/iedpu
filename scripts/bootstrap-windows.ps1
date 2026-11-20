@@ -68,7 +68,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "The active PHP runtime does not satisfy the installed packages."
 }
 
-Write-Host "`n6/6 - Verifying CodeIgniter and the full local environment"
+Write-Host "`n6/7 - Verifying CodeIgniter and the full local environment"
 & $PhpPath "scripts/check-environment.php"
 if ($LASTEXITCODE -ne 0) {
     throw "The full environment readiness check failed."
@@ -80,6 +80,12 @@ if ($LASTEXITCODE -ne 0) {
 & $PhpPath "spark" "routes"
 if ($LASTEXITCODE -ne 0) {
     throw "CodeIgniter route listing failed."
+}
+
+Write-Host "`n7/7 - Verifying the configured database connection (read-only)"
+& $PhpPath "scripts/check-database-connection.php"
+if ($LASTEXITCODE -ne 0) {
+    throw "The configured database connection failed. Check the local .env and create the empty iedpu_dev database."
 }
 
 Write-Host "`nWP01 local dependency bootstrap completed. Review git status and commit the regenerated composer.lock; vendor/ must remain untracked." -ForegroundColor Green
