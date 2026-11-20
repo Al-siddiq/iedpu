@@ -98,12 +98,39 @@ foreach (['writable/cache', 'writable/logs', 'writable/session', 'writable/uploa
 if (! $preflightOnly) {
     $manifestPath = $root . DIRECTORY_SEPARATOR . 'composer.json';
     $lockPath = $root . DIRECTORY_SEPARATOR . 'composer.lock';
+    $manifest = json_decode((string) file_get_contents($manifestPath), true);
     $lock = json_decode((string) file_get_contents($lockPath), true);
+
+    foreach ([
+        'codeigniter4/framework' => '4.7.6',
+        'codeigniter4/shield' => '1.4.1',
+    ] as $packageName => $expectedVersion) {
+        $manifestVersion = $manifest['require'][$packageName] ?? null;
+        report(
+            "Manifest requirement: {$packageName}",
+            $manifestVersion === $expectedVersion,
+            $manifestVersion === $expectedVersion
+                ? "Pinned to {$expectedVersion}."
+                : "Found " . ($manifestVersion ?? 'missing') . "; expected exact {$expectedVersion}."
+        );
+    }
+
+    report(
+        'No automated test dependencies',
+        empty($manifest['require-dev']) && empty($manifest['scripts']['test']),
+        'The project verification policy is manual-only.'
+    );
 
     $lockedPackages = [];
     foreach (array_merge($lock['packages'] ?? [], $lock['packages-dev'] ?? []) as $package) {
         $lockedPackages[$package['name']] = ltrim((string) ($package['version'] ?? ''), 'v');
     }
+
+    report(
+        'No locked development packages',
+        empty($lock['packages-dev']),
+        'composer.lock contains no development-only test packages.'
+    );
 
     $expected = [
         'codeigniter4/framework' => '4.7.6',
