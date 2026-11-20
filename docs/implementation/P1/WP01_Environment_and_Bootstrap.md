@@ -70,7 +70,7 @@ The repository's existing composer.lock predates these requirements. Do not run 
 - php spark --version;
 - php spark routes.
 
-The bootstrap uses --no-scripts because Shield's post-update hook only installs an optional development pre-commit hook; no runtime setup is skipped. The generated lockfile must be committed. The vendor/ directory remains ignored.
+The bootstrap uses --no-scripts because Shield's post-update hook only installs an optional development pre-commit hook; no runtime setup is skipped. The database checker boots CI4 in CLI mode and executes only SELECT 1. The generated lockfile must be committed. The vendor/ directory remains ignored.
 
 ## 6. Web-root and secret protection
 
@@ -91,7 +91,7 @@ WP01 uses manual verification only. No PHPUnit, browser automation, API automati
 | WP01-M03 | Verify platform requirements | composer check-platform-reqs succeeds |
 | WP01-M04 | Confirm exact installed framework/Shield/Settings versions | Composer package listing and full environment checker pass |
 | WP01-M05 | Start Spark and list routes | php spark --version and php spark routes succeed |
-| WP01-M06 | Confirm local environment/database connection | Application connects to empty iedpu_dev database |
+| WP01-M06 | Run scripts/check-database-connection.php after creating the empty local database | Read-only SELECT 1 succeeds; no schema/data changes are made |
 | WP01-M07 | Inspect repository and public paths | .env and vendor/ ignored; web root points to public/ |
 | WP01-M08 | Inspect local/staging/production profile separation | Distinct URL, database credentials and secure flags; staging/production debug off |
 
