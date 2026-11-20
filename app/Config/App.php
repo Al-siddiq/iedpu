@@ -16,7 +16,7 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = env('app.baseURL', 'http://127.0.0.1:8080/');
+    public string $baseURL = 'http://127.0.0.1:8080/';
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
@@ -40,7 +40,7 @@ class App extends BaseConfig
      * something else. If you have configured your web server to remove this file
      * from your site URIs, set this variable to an empty string.
      */
-    public string $indexPage = env('app.indexPage', '');
+    public string $indexPage = '';
 
     /**
      * --------------------------------------------------------------------------
@@ -133,7 +133,7 @@ class App extends BaseConfig
      * @see https://www.php.net/manual/en/timezones.php for list of timezones
      *      supported by PHP.
      */
-    public string $appTimezone = env('app.appTimezone', 'Africa/Lagos');
+    public string $appTimezone = 'Africa/Lagos';
 
     /**
      * --------------------------------------------------------------------------
@@ -157,7 +157,7 @@ class App extends BaseConfig
      * secure, the user will be redirected to a secure version of the page
      * and the HTTP Strict Transport Security (HSTS) header will be set.
      */
-    public bool $forceGlobalSecureRequests = (bool) env('app.forceGlobalSecureRequests', ENVIRONMENT === 'production');
+    public bool $forceGlobalSecureRequests = ENVIRONMENT === 'production';
 
     /**
      * --------------------------------------------------------------------------
