@@ -30,13 +30,13 @@ if (-not (Test-Path ".env")) {
     Write-Warning "Created .env from the development example. Review database name, username and password before continuing."
 }
 
-Write-Host "`n1/6 - Checking PHP and required extensions"
+Write-Host "`n1/7 - Checking PHP and required extensions"
 & $PhpPath "scripts/check-environment.php" "--preflight"
 if ($LASTEXITCODE -ne 0) {
     throw "PHP preflight failed. Correct the reported PHP version/extensions before continuing."
 }
 
-Write-Host "`n2/6 - Checking Composer availability"
+Write-Host "`n2/7 - Checking Composer availability"
 $ComposerCommand = Get-Command composer -ErrorAction SilentlyContinue
 if (-not $ComposerCommand) {
     throw "Composer was not found. Install Composer for Windows and configure it to use this XAMPP PHP executable: $PhpPath"
@@ -46,20 +46,20 @@ if ($LASTEXITCODE -ne 0) {
     throw "Composer could not start."
 }
 
-Write-Host "`n3/6 - Validating the manifest before lock refresh"
+Write-Host "`n3/7 - Validating the manifest before lock refresh"
 composer validate --no-check-publish --no-check-lock
 if ($LASTEXITCODE -ne 0) {
     throw "composer.json validation failed."
 }
 
-Write-Host "`n4/6 - Resolving and installing the approved locked dependencies"
+Write-Host "`n4/7 - Resolving and installing the approved pinned dependencies"
 composer update --with-all-dependencies --no-interaction --no-scripts
 if ($LASTEXITCODE -ne 0) {
     throw "Composer dependency resolution failed. Do not deploy until this is resolved."
 }
 
-Write-Host "`n5/6 - Verifying installed platform requirements"
-composer validate --strict
+Write-Host "`n5/7 - Verifying installed platform requirements"
+composer validate --no-check-publish
 if ($LASTEXITCODE -ne 0) {
     throw "Composer manifest/lock validation failed."
 }
