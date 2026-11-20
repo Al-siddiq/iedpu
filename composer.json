@@ -1,14 +1,7 @@
 {
     "name": "iedpu/north-zone-portal",
     "description": "IEDPU North Zone Digital Membership, Administration and Development Portal",
-    "license": "MIT",
     "type": "project",
-    "homepage": "https://codeigniter.com",
-    "support": {
-        "forum": "https://forum.codeigniter.com/",
-        "source": "https://github.com/codeigniter4/CodeIgniter4",
-        "slack": "https://codeigniterchat.slack.com"
-    },
     "require": {
         "php": "^8.4",
         "codeigniter4/framework": "4.7.6",
