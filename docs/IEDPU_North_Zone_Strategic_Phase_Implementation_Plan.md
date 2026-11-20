@@ -27,6 +27,16 @@ This is a **sequenced delivery plan**, not a replacement SRS or a redesign of th
 
 **Precedence for this work:** Respect constitutional limits; follow subsequent explicit project decisions over the broader aspirations of the initial proposal for the first release; follow SRS functions and database design unless a discrepancy is raised for decision. The later user instruction **U** replaces testing-method suggestions in S §16 and §18.2 with manual execution. It does **not** remove any functional, security, performance, accessibility, financial, integrity or audit acceptance requirement.
 
+### 0.4 P0 disposition following project-owner implementation clarification
+
+The project owner confirms the development engagement is already approved and partially funded. **P1 commencement is not conditional on obtaining the same approval again.** P0 reconciles technical decisions and activation holds, not procurement or contract authorisation.
+
+Authorised Committee administrators enter and manage **zones, branches, Branch Chairmen/office holders and portal role profiles** through protected interfaces. No zone, branch, office-holder or role name/ID is a hardcoded business rule. Northern Zone remains the approved operational scope and executable permission keys remain release-controlled. The historical branch schedule is optional reference material, not mandatory seed data.
+
+Missing branch/Chairman lists, finance providers or NEC card delegation do **not** block P1. P1 starts with safe empty organisational datasets and server-disabled live capabilities. Live registration requires validated active branches, versioned registration form and privacy approval; finance and official ID retain separate gates.
+
+**Owner-confirmed answers:** First Committee Super Administrator identity is supplied at P2 secure provisioning. The **Committee Super Administrator directly activates branches** after validation and audit, without a mandatory second approver. The **Committee Super Administrator approves versioned registration forms and privacy notices** before live use, subject to lawful processing. A separate developer interface retains specialist technical duties; developers are IEDPU members and may also receive independently authorised organisational roles. See `docs/implementation/P0/Engineering_Decision_Register.md`.
+
 ### 0.2 Hard scope boundaries
 
 - **Existing IEDPU members only**, not a public register of all descendants in the first release.
@@ -142,30 +152,30 @@ flowchart TD
 
 # 3. Phase-by-phase execution plan
 
-## P0 — Governance, baseline and release decisions
+## P0 — Engineering baseline, unresolved decisions and release controls
 
-**Purpose.** Establish what the team is authorised to build, who approves it and which external facts require confirmation. No real member data should enter the system before this gate.
+**Purpose.** Confirm that commencement is already authorised; reconcile technical ambiguities and establish safe implementation rules. P0 is a developer-led documentation exercise, not a second contract or funding approval. Do not introduce real member data in P0.
 
-**Inputs:** C §§2, 4, 6, 13 and First Schedule; P §§2–11; S §§1, 6, 18; D §§1, 30.
+**Inputs:** Constitution §§2, 4, 6, 13 and First Schedule; Business Blueprint §§2–11; SRS §§1, 6, 18; Database Schema §§1, 30; current project-owner clarifications.
 
 **Work packages**
 
-1. Record the first-release boundary as **existing members only**; no households, no state/LGA command roles.
-2. Obtain the approved North Zone branch list, current status, names and state/FCT mapping. Treat the Constitution's Northern Zone schedule as a source baseline requiring verification, not the current live register.
-3. Confirm Committee mandate, delegation, role approval matrix, official office records, Branch Chairman verification delegation and second-approval policy.
-4. Approve the registration form version: mandatory fields, permissible optional fields, member contact proof, ancestry options, privacy notice and consent wording. Preserve the distinction between a notice acknowledgement and optional professional-data consent.
-5. Identify authoritative custodian of membership numbering and NEC card issuing authority; if unresolved, leave official card issuance gated.
-6. Approve initial developer/operator accounts and the technical-admin boundary.
-7. Decide data controller, lawful basis, correction/retention procedure, export privileges, local offline-cache retention and backup responsibility.
-8. Confirm preferred domain `iedpu.ng` subject to registration; confirm IEDPU ownership of domain, hosting, repository and data.
-9. Approve phase release boundaries and a written manual-test evidence template. Determine who signs each acceptance pack.
-10. Record open decisions for payment service, settlement account arrangement and bank verification separately; **do not block P1–P5 on finance-provider procurement**.
+1. Confirm first-release boundaries: existing members only, individual registration, Northern Zone operations, no state/LGA command hierarchy.
+2. Adopt administrator-managed zone, branch, office-holder and role-profile records. Historical branch names are optional references; no mandatory organisational seed. Committee Super Administrator may activate validated branches directly with audit.
+3. Define controlled executable permission keys, dynamic role bundles, scoped assignments, protected grants and one-time audited initial provisioning. First operational Super Administrator identity arrives at P2, not P0.
+4. Document Chairman/office-holder entry before member registration, later reviewed member linking and separately authorised verification access. Distinguish Committee business powers from developer technical interface; developers may hold separately authorised organisational roles.
+5. Prepare versioned registration-field and privacy-notice decision templates; leave live registration disabled until Committee Super Administrator approval and legal privacy prerequisites.
+6. Record safe defaults for official membership numbers, NEC cards, offline private data, exports, payments, external messaging and backup/retention ownership.
+7. Confirm IEDPU ownership of domain, hosting, repository and data; check actual technical environment during P1, without guessing capabilities.
+8. Maintain engineering decisions and unresolved business/constitutional *activation* holds with owners and affected phases; do not block P1 on future-provider procurement.
+9. Confirm release boundaries and human-executed manual verification policy.
+10. Publish a P0-to-P1 readiness record with adopted decisions, outstanding activation holds and server-disabled live functions.
 
-**Deliverables:** `Project_Decision_Register.md`, `Governance_Authority_Matrix.md`, `Approved_Branch_Baseline.csv`, `Registration_Field_Rules.md`, `Role_Permission_Approval_Matrix.md`, `Data_Governance_Approval_Record.md`, `Manual_Test_Register.md`, signed P0 decision sheet.
+**Deliverables:** `Engineering_Decision_Register.md` (engineering reconciliation), `Project_Decision_Register.md`, `Governance_Authority_Matrix.md`, `Registration_Field_Rules.md`, `Role_Permission_Approval_Matrix.md`, `Data_Governance_Approval_Record.md`, `Manual_Test_Register.md`, P0 decision sheet and **optional** `Approved_Branch_Baseline.csv` template/import. External approvals not received must remain marked pending.
 
-**Manual checks:** Check each approved branch against source/authority; compare each role to official office separation; check one registered-member scenario and reject a non-member scenario; verify that the decision register marks all unresolved approvals as gates rather than guesses.
+**Manual checks:** Cross-read four foundation documents for conflicting seed assumptions; verify no hardcoded organisational names/role profiles; distinguish office and portal roles; walk through existing-member/non-member registration; confirm all activation holds.
 
-**Exit:** Committee/project authority accepts scope, branch activation process, responsibilities, approvals and testing method. No unconfirmed branch is silently marked active.
+**Exit:** Engineering baseline ready for P1 with no unresolved *technical design* blocker. Constitutional, privacy, finance and official ID approvals are enforced at their respective activation gates.
 
 ## P1 — Technical environment, delivery skeleton and mobile-first UX
 
@@ -201,7 +211,7 @@ flowchart TD
 **Work packages**
 
 1. Run **Shield's own migrations** (do not clone/reinvent Shield user/auth tables); manually inspect their structure and matching user-ID types.
-2. Implement D-defined organisation/geography tables, controlled seeding of recognised zones and 19-state/FCT coverage, branch seed staging and reference ancestral areas.
+2. Implement D-defined organisation/geography tables and protected admin workflows for zone, approved coverage, branch and office records; permit reviewed optional reference imports, but do not mandatory-seed zone/branch/role records or auto-activate branches.
 3. Implement portal roles, permission catalogue, role-permission mappings and scoped assignment tables, including date/scope validity and protected-role approval controls.
 4. Implement independent official-office catalogue and assignments. Do **not** give portal permissions because of constitutional titles.
 5. Implement reusable approval requests/decisions with maker-checker where required and record both decision and business operation.
@@ -227,7 +237,7 @@ flowchart TD
 
 **Work packages**
 
-1. Activate approved branch records with current state/FCT and locality; retain original First Schedule source spellings and recognition references.
+1. Provide admin entry and controlled confirmation/activation of branch records with current state/FCT and locality; preserve First Schedule source spellings only when an optional reference import is used.
 2. Provide Committee branch CRUD/activation/deactivation (within authority), branch lookup and branch-only scope enforcement; inactive/unconfirmed branches cannot receive new registrations.
 3. Provide official IEDPU office records and term history as **information**, with separate software-role assignments.
 4. Build approved versioned registration form (`registration_form_versions`, `registration_field_rules`), field-level server validations, privacy notice acknowledgement and optional professional-data consent.
@@ -439,7 +449,7 @@ flowchart TD
 | ID | Dependency | Why it matters | Blocks |
 |---|---|---|---|
 | DEP-01 | Committee mandate and delegation | Portal administrator ≠ constitutional authority | Production high-risk roles/actions |
-| DEP-02 | Current approved branches | Registration/verification must route to legitimate branch | Live registrations |
+| DEP-02 | Current approved branches entered/confirmed by admins | Registration/verification must route to legitimate active branch; no prerequisite to P1 coding | Live registrations |
 | DEP-03 | PHP/DB/Shield version and matching FK types | Prevent incompatible migrations/user linkage | P2 onward |
 | DEP-04 | Authentication, scopes and audit before business modules | Prevent privilege/data leakage | P3–P10 |
 | DEP-05 | Approved registration form and privacy framework | Required/optional fields and lawful collection | Live registration |
