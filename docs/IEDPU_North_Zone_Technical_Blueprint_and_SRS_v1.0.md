@@ -95,6 +95,24 @@ The Constitution supplied for the project identifies membership and identity-car
 
 ---
 
+## 1.4 Implementation clarification — dynamic administration and commencement
+
+The project owner has confirmed project commissioning and authority to begin development. P0 is technical reconciliation, not a requirement to re-obtain contract approval. The existing release gates still govern **live functions**.
+
+**Database-driven administration:** Zone records, approved project coverage, branch names/status, office catalogue, Chairmen/office-holder appointments, portal role profiles and user-role assignments are maintained by authorised administrators through protected interfaces. Do not hardcode names, numeric IDs or a fixed role hierarchy. Northern Zone remains the approved operational scope.
+
+**Controlled permissions:** Executable permission keys are defined and versioned by software releases. Authorised administrators compose dynamic role profiles using only allowed keys within their grant ceiling. Backend scope, ownership, expiry, protected-grant and self-elevation safeguards apply regardless of role name. Member self-service also requires ownership and verified-member checks.
+
+**Bootstrap and separated interfaces:** One-time audited CLI/setup provisioning may create a limited technical operator. No default credentials or permanent public setup endpoint. The owner supplies the first Committee Super Administrator identity when P2 secure provisioning requires it. The developer interface handles configuration, deployment, migrations, backups, diagnostics and security maintenance; technical operators cannot self-appoint to Committee powers. Developers may separately receive authorised IEDPU organisational roles.
+
+**Unlinked Chairmen:** Official office assignments may store a required holder name and term with nullable `member_id`. A name-only record cannot log in, verify membership or exercise portal powers. Later member linking and separately approved scoped account/role assignment are audited.
+
+**Owner-confirmed authorities:** The Committee Super Administrator may **directly activate** a validated branch without a second approver, recording recognition/location evidence and audit. The Committee Super Administrator approves versioned registration rules and privacy notices, subject to lawful processing prerequisites.
+
+**Safe defaults:** New branches pending/inactive; live registration disabled until approved form/privacy; finance, official ID, external messaging and private offline editing disabled until their own gates. The historic constitutional branch list is optional reference data, not mandatory application seeds.
+
+See `docs/implementation/P0/Engineering_Decision_Register.md`.
+
 # 2. TECHNICAL ARCHITECTURE
 
 ## 2.1 Approved technology stack
@@ -1730,6 +1748,8 @@ The server remains the authoritative source for membership status, permissions, 
 
 # 16. TESTING AND QUALITY ASSURANCE
 
+**Execution policy (approved later instruction):** The categories below are verified by humans through manual scenarios, browser/devtools, manual HTTP requests, SQL inspection and recorded evidence. They do not authorise PHPUnit, automated browser/API runners, automated regression suites or CI test pipelines as project verification. Composer, migrations, linting/static analysis and normal operational automation remain allowed. This clarification follows the Strategic Phase Implementation Plan §5.1.
+
 ## 16.1 Testing categories
 
 The development team must perform:
@@ -1869,7 +1889,7 @@ The no-build-tool requirement is feasible with Vue's global production build, no
 
 However, it means the project will not use Vue Single-File Components, compile-time tree-shaking or TypeScript checking.
 
-The development team must compensate through clear module organisation, linting or static checks that do not require a production bundler, code review and automated browser tests.
+The development team must compensate through clear module organisation, linting or static checks that do not require a production bundler, code review, controlled static inspection and manually executed browser checks.
 
 Do not quietly introduce a build tool without project approval.
 
