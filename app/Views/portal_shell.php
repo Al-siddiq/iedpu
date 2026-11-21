@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#17324D">
+    <link rel="manifest" href="<?= esc(base_url('manifest.webmanifest'), 'attr') ?>">
+    <link rel="icon" type="image/svg+xml" href="<?= esc(base_url('assets/icons/portal-192.svg'), 'attr') ?>">
     <meta name="description" content="IEDPU Northern Zone membership and administration portal — public information and interface previews.">
     <title>IEDPU Northern Zone | Digital Portal</title>
     <link rel="stylesheet" href="<?= esc(base_url('assets/css/bootstrap.min.css'), 'attr') ?>">
@@ -152,7 +154,15 @@
 <div id="frontend-error" class="frontend-error" role="alert" hidden>
     The interface could not start. Install the local Vue vendor asset using <code>scripts/install-frontend-vendors.ps1</code>, then reload this page.
 </div>
+<section id="pwa-notice" class="pwa-notice" hidden aria-label="Portal installation and updates">
+    <p id="pwa-message" role="status"></p>
+    <button id="pwa-install" type="button" class="btn btn-primary btn-sm" hidden>Install portal</button>
+    <button id="pwa-update" type="button" class="btn btn-primary btn-sm" hidden>Refresh to update</button>
+    <button id="pwa-dismiss" type="button" class="btn btn-outline-secondary btn-sm">Dismiss</button>
+</section>
+<script defer src="<?= esc(base_url('assets/js/vendor/dexie.min.js'), 'attr') ?>"></script>
 <script defer src="<?= esc(base_url('assets/js/vendor/vue.global.prod.js'), 'attr') ?>"></script>
 <script defer type="module" src="<?= esc(base_url('assets/js/core/app.js'), 'attr') ?>"></script>
+<script type="module" src="<?= esc(base_url('assets/js/core/pwa.js'), 'attr') ?>"></script>
 </body>
 </html>
