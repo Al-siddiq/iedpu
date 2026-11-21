@@ -38,6 +38,10 @@ $routes->group('api/v1', ['namespace' => 'App\\Controllers\\Api\\V1'], static fu
     $routes->add('auth', 'UnavailableController::disabled');
     $routes->add('auth/(:any)', 'UnavailableController::disabled');
 
+    // WP03 first increment: authenticated, MFA-verified, permission-scoped
+    // READ-ONLY directories. All writes remain disabled by the fallback below.
+    $routes->get('administration/directory/(:segment)', 'DirectoryController::show/$1');
+
     // P2+ functions are deliberately unavailable. No temporary public CRUD,
     // membership enrolment, administrator or developer privilege is exposed.
     foreach ([
