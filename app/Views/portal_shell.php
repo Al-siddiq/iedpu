@@ -50,6 +50,7 @@
                 <div class="sidebar-notice">
                     <span class="notice-icon" aria-hidden="true"><svg class="bi" aria-hidden="true" focusable="false"><use href="<?= esc(base_url('assets/icons/bootstrap-icons.svg'), 'attr') ?>#info-circle"></use></svg></span>
                     <p>These are design previews. Member sign-in and administrative functions are not yet available.</p>
+                    <p><a href="<?= esc(base_url('constitution/2015'), 'attr') ?>">Read the 2015 Constitution</a> (source-derived reading copy).</p>
                 </div>
             </aside>
 
