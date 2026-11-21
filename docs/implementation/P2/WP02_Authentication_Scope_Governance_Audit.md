@@ -62,6 +62,18 @@ C:\xampp\php\php.exe -l app\Commands\P2AuthFixture.php
 C:\xampp\php\php.exe -l app\Commands\P2AuditVerify.php
 ```
 
+## Quick Windows negative-path smoke
+
+With XAMPP MySQL and Spark running in a separate CMD window, use:
+```bat
+cd C:\xampp\htdocs\iedpu
+git pull --ff-only origin feature/p2-database-auth-governance
+C:\xampp\php\php.exe scripts\test-p2-login-identifier.php
+powershell -ExecutionPolicy Bypass -File scripts\test-p2-auth-smoke.ps1
+C:\xampp\php\php.exe spark iedpu:p2-audit-verify
+```
+The PowerShell script checks health 200, CSRF 200, anonymous session 401, missing-CSRF login 403, unknown credentials 401, disabled administration 403 and unknown API 404. It does **not** create users or prove MFA/approval acceptance. The PHP identifier script runs without Composer dependencies.
+
 ## WP02 completion blockers / next engineering increments
 
 - **Account lifecycle**: invitation/activation/recovery/password change with single-use hashed expiry-bound tokens, verified email/phone ownership, delivery adapters, safe resend, and session revocation across devices. Production SMS/email provider and assisted recovery policy not approved.
