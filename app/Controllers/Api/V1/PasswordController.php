@@ -52,8 +52,8 @@ final class PasswordController extends BaseController
             }
             $errors = ApiInput::requiredTextFields($input['data'], [
                 'current_password' => 1024,
-                'new_password' => 128,
-                'confirm_password' => 128,
+                'new_password' => 72,
+                'confirm_password' => 72,
             ]);
             if ($errors !== []) {
                 return ApiResponder::error($this->request, $this->response, 422, 'invalid_request', 'Invalid request.', $errors);
