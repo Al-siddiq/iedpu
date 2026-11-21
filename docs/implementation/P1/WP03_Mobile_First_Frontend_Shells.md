@@ -108,3 +108,7 @@ This WP creates **public read-only design previews only**. Menu items are not an
 WP04 owns manifest, Service Worker, safe offline shell, Dexie/IndexedDB foundation, staging/deployment/rollback and complete P1 end-to-end acceptance. Sensitive offline data remains disabled.
 
 **Exit status:** Source implementation committed. Vue asset pin/commit and manual checks are pending. Keep PR #2 draft; do not merge into `main` yet.
+
+## 7. Vendor and owner confirmation (21 November 2026)
+
+The owner reports successful Vue installation and approves the interface appearance. GitHub inspection confirms public/assets/js/vendor/vue.global.prod.js is present and identifies Vue 3.5.24. The root-only Composer ignore rule is corrected. Remaining device/accessibility checks remain pending final P1 evidence. WP04 authorised to proceed.
