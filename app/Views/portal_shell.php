@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#17324D">
     <link rel="manifest" href="<?= esc(base_url('manifest.webmanifest'), 'attr') ?>">
+    <link rel="icon" href="<?= esc(base_url('favicon.ico'), 'attr') ?>" sizes="any">
     <link rel="icon" type="image/png" sizes="32x32" href="<?= esc(base_url('assets/icons/favicon-32.png'), 'attr') ?>">
     <link rel="icon" type="image/png" sizes="16x16" href="<?= esc(base_url('assets/icons/favicon-16.png'), 'attr') ?>">
+    <link rel="icon" type="image/png" sizes="48x48" href="<?= esc(base_url('assets/icons/favicon-48.png'), 'attr') ?>">
     <link rel="apple-touch-icon" sizes="180x180" href="<?= esc(base_url('assets/icons/apple-touch-icon.png'), 'attr') ?>">
     <meta name="description" content="IEDPU Northern Zone membership and administration portal — public information and interface previews.">
     <title>IEDPU Northern Zone | Digital Portal</title>
