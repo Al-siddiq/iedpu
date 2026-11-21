@@ -75,7 +75,7 @@ final class PasswordController extends BaseController
                 return $this->error(401, 'incorrect_password', 'The current password is incorrect.');
             }
             if ($result === 'weak') {
-                return $this->error(422, 'weak_password', 'Use 12–128 characters, including letters and numbers, with no control characters.');
+                return $this->error(422, 'weak_password', 'Use 12–72 bytes, including letters and numbers, with no control characters.');
             }
             if ($result === 'same') {
                 return $this->error(422, 'password_reused', 'Choose a different password.');
