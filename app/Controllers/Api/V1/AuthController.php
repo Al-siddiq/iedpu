@@ -132,7 +132,7 @@ final class AuthController extends BaseController
             if ($policy->requiresPendingMfa((int) $user->id) || $hasFactor) {
                 // Password verification is NOT an authenticated Shield session.
                 // Bind a short-lived challenge to this server-side session only.
-                new \\App\\Libraries\\Auth\\TotpFactor($db); // fail closed if MFA key is missing
+                new \App\Libraries\Auth\TotpFactor($db); // fail closed if MFA key is missing
                 session()->regenerate(true);
                 session()->remove('iedpu_mfa_verified_user');
                 session()->set('iedpu_mfa_pending', [
