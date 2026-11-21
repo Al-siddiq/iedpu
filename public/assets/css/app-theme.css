@@ -38,7 +38,12 @@ a:hover { color: var(--iedpu-red-dark); }
 .portal-topbar { min-height: 80px; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 13px 20px; background: #fff; border-bottom: 1px solid var(--iedpu-border); position: sticky; top: 0; z-index: 30; box-shadow: 0 2px 14px rgb(18 43 66 / 3%); }
 .brand { display: inline-flex; align-items: center; gap: .75rem; text-decoration: none; color: var(--iedpu-navy); min-width: 0; }
 .brand:hover { color: var(--iedpu-navy); }
-.brand-mark { width: 47px; height: 47px; flex: 0 0 47px; display: grid; place-items: center; color: #fff; font-size: 17px; font-weight: 900; letter-spacing: -.09em; border-radius: 13px; background: var(--iedpu-red); box-shadow: inset -9px -9px 0 rgb(0 0 0 / 8%); }
+.brand-mark { width:47px; height:47px; flex:0 0 47px; display:grid; place-items:center; background:#fff; border-radius:8px; overflow:hidden; } 
+.brand-mark img { display:block; width:100%; height:100%; object-fit:contain; }
+.bi { display:inline-block; width:1em; height:1em; fill:currentColor; vertical-align:-.125em; flex-shrink:0; }
+.nav-symbol .bi,.mobile-nav-symbol .bi,.preview-icon .bi,.art-icon .bi,.notice-icon .bi,.info-strip-icon .bi,.banner-icon .bi,.feature-check .bi,.side-card-icon .bi { display:block; margin:auto; }
+.feature-check .bi { font-size:16px; }
+.preview-arrow .bi,.text-link .bi,.hero-actions .bi { margin-inline-start:.2em; }
 .brand-name { display: grid; gap: 1px; line-height: 1.18; }
 .brand-name strong { font-size: 20px; letter-spacing: -.04em; }
 .brand-name small { color: var(--iedpu-muted); font-size: 11px; letter-spacing: .01em; }
