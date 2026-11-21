@@ -72,3 +72,35 @@ The owner confirmed the previous password-change flow and Show/Hide/six-characte
 - **Security integration:** audit-chain append concurrency and nested transaction boundaries require manual verification and a reliable atomic mutation wrapper before issuing credentials or executing approvals.
 
 **No PR merge, live bootstrap or real account delivery is authorised by this migration.**
+
+
+## Owner-reported local preflight acceptance — 21 November 2026
+
+The owner supplied a Windows CMD screenshot with the following direct observations:
+- Governance preflight: all three new tables OK, token primitive OK, approval intent canonicalisation/tamper detection OK, bootstrap **not performed**, foundation preflight passed and all operational routes explicitly held.
+- Auth diagnose: all listed Shield/P2 tables, sodium/TOTP key, synthetic identifier, Shield account/password identity and synthetic MFA role OK; preflight passed.
+- Audit verify: **16 events verified** and last hash reported. The verifier cautions that current DB hash integrity is not independent tamper-proof evidence.
+
+**Accepted from screenshot:** foundation diagnostic, synthetic auth readiness and current audit-chain verification. **Not independently evidenced:** phpMyAdmin zero-row inspection of all tables, repeated preflight, HTTP negative-route regression, or real delivery/recovery. Do not silently mark GOV-F02, GOV-F04, GOV-F05 or GOV-F06 complete.
+
+## Next increment — internal transactional token lifecycle (21 November 2026)
+
+Added app/Libraries/Auth/AccountActionTokenStore.php as an **internal service only**. It supports, under a caller-owned transaction, issuance and replacement of a pending token, redemption with DB row locking and single-use transition, strict purpose/user/identifier checks, expiry checks using database UTC clock, and revocation of all pending account-action tokens. For reset, the destination identifier must already be active and verified; for invitation/verification, it must be pending. No token, recipient identifier, credential or secret is written to logs. This service does **not** send email/SMS, provision users, verify actual delivery, change passwords, assign roles, execute approvals, or commit any account change by itself. The future caller must atomically combine token consumption with the account mutation, session revocation and durable audit.
+
+Added rollback-only local diagnostic: php spark iedpu:p2-token-lifecycle-check --confirm-synthetic. It requires ENVIRONMENT=development, IEDPU_ALLOW_SYNTHETIC_AUTH=1, a localhost disposable iedpu_dev*/iedpu_test*/iedpu_local*/iedpu_disposable* database, and the existing verified synthetic phone-only fixture. The diagnostic exercises wrong-purpose/wrong-user denial, valid single-use, replay rejection, replacement invalidation, expiry and revocation; it **always rolls back** all token writes and never prints tokens.
+
+### Manual verification for this increment
+
+1. In Windows CMD, update the same development branch and run the local-only command:
+   ~~~bat
+   cd C:\xampp\htdocs\iedpu
+   git switch feature/p2-database-auth-governance
+   git pull --ff-only origin feature/p2-database-auth-governance
+   php spark iedpu:p2-token-lifecycle-check --confirm-synthetic
+   ~~~
+2. Expected: five OK lines (wrong purpose/account denied; one-time and replay; reissue invalidation; expired/revoked denial; rollback and unchanged row count) followed by an explicit HOLD line. No plaintext token appears.
+3. Run it a second time; expected identical checks and unchanged token row count. Confirm portal_bootstrap_state is still empty. **Do not** insert or send real tokens.
+4. Re-run php spark iedpu:p2-audit-verify; it should still pass. No new audit event is expected from the rollback-only diagnostic.
+5. If the diagnostic fails, copy only its non-secret status lines and exception class. Do not send .env, token strings, password hashes or TOTP secrets.
+
+**Acceptance status:** pending owner execution. The next activation step still requires approved delivery/recipient possession, independent privileged recovery, authorised bootstrap and an atomic mutation+audit service. All HTTP write routes remain 403 and PR #3 remains draft.
