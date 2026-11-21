@@ -1,12 +1,12 @@
 # P2-WP02 — Authenticated self-service password rotation
 
-**Committed:** 21 November 2026. **Status: owner local manual acceptance PENDING.** This is one working account-management increment, **not** complete invitation/recovery/bootstrap/governance delivery. Session-expiry increment also remains owner-acceptance pending.
+**Committed:** 21 November 2026. **Status: initial password-change flow owner-accepted; owner-requested usability adjustments committed, local recheck pending.** This is one working account-management increment, **not** complete invitation/recovery/bootstrap/governance delivery. Session-expiry increment also remains owner-acceptance pending.
 
 ## Security boundary and delivered code
 
 - `GET /account/security` displays a private, responsive password-change form **only** for a currently signed-in active user with a verified identifier, existing TOTP factor, successfully verified authenticator in the current session, and current DB session version and expiry. The synthetic zero-permission MFA account may access its own account-security page; it cannot access administration.
 - `POST /api/v1/auth/password/change` is the only new mutation. It accepts **only** `current_password`, `new_password`, `confirm_password`; requires the same verified active MFA session, global CSRF and per-account throttling. It cannot change anyone else's account.
-- Requires the correct current password; new password must differ, be 12–72 bytes, include letters and numbers, and contain no ASCII control characters. A full password-policy/compromised-password screening decision remains a later hardening task.
+- Requires the correct current password; new password must differ and contain at least six UTF-8 characters (maximum 72 bytes). Digits-only, letters-only, and mixed passwords are accepted; empty/whitespace-only values and ASCII control characters are rejected. A full password-policy/compromised-password screening decision remains a later hardening task.
 - Under a DB transaction and locked Shield password identity row: verify the current hash, replace **the single Shield `auth_identities.secret2` hash** with a PHP-compatible password hash, increment the account-wide session version, append a chained `auth.password_changed` audit event, and commit. A failed audit causes transaction rollback. No passwords or hashes appear in API responses, logs or audit events.
 - On success, log out the current Shield session and return `password_changed=true`, `sessions_revoked=true` and `sign_in_required=true`. Every other browser's old session fails on its next protected request.
 - No public password reset, email/SMS delivery, lost-device recovery, passwordless login, invitation, role grant, official office privilege, or admin account-change route is enabled. Users without an enrolled and verified authenticator cannot use this endpoint yet; their secure enrolment/recovery lifecycle is still a WP02 blocker.
@@ -24,7 +24,7 @@
    No migration is required. If the earlier session-expiry test overrides remain in `.env`, remove them and restart Spark so the normal session policy applies.
 2. Browser A: sign in as the existing synthetic phone-only account, complete Google Authenticator, then open `http://127.0.0.1:8080/account/security`. The page must load. Browser B: independently sign in with the same synthetic account and fresh authenticator code; `/api/v1/auth/session` should return HTTP 200.
 3. Browser A: submit an incorrect current password with a valid new password and matching confirmation. Expect **401** and no password change. A mismatched confirmation must return **422**. Repeated incorrect attempts must eventually return **429**. Do not test high-volume throttling on a live environment.
-4. Browser A: submit the **correct** current password, a different strong new test password (12–72 bytes, letters and numbers), and matching confirmation. Expect success message and the form to disappear. Do **not** navigate away until you have privately recorded the new test password.
+4. Browser A: submit the **correct** current password, a different strong new test password (at least six characters (digits-only, letters-only or mixed; maximum 72 bytes)), and matching confirmation. Expect success message and the form to disappear. Do **not** navigate away until you have privately recorded the new test password.
 5. Browser B: refresh `/api/v1/auth/session`. Expect HTTP **401** because the password change invalidated all prior sessions. Browser A must also be logged out.
 6. Attempt sign-in with the **old** password; expect **401**. Sign in using the **new** password and a fresh TOTP; expect the existing MFA challenge and then HTTP 200 on `/api/v1/auth/session`. The account must retain its same identifier and authenticator factor.
 7. Anonymous browser: `/account/security` must redirect to sign-in; unauthenticated password change must return 401 with a valid CSRF token; missing-CSRF POST must return 403. The synthetic MFA-only role must still be denied the WP03 administrative workspace (403).
@@ -50,3 +50,19 @@
 | Protected role grants, scope ceilings, branch mutations, office appointments | **Not enabled** until bootstrap and approvals are accepted |
 
 **Please report the result of the numbered checks and whether you accept the new password-change increment.** This is not authority to merge draft PR #3 or deploy live accounts.
+
+## Owner usability change — 21 November 2026 (recheck pending)
+
+The owner reported the previous password-change flow worked and requested two adjustments:
+1. Add accessible, explicit **Show / Hide** buttons for every password input in `/sign-in` and `/account/security`. Controls use `type=button`, `aria-controls`, `aria-pressed`, and update the field's `type` without writing the password to storage. Visibility is reset to hidden after form submission/secret clearing.
+2. Adopt an explicit minimum of **six characters**, allowing digits only, letters only or any mixture, with no composition requirement. The maximum remains **72 UTF-8 bytes** to avoid bcrypt's 72-byte truncation ambiguity; whitespace-only/control-character passwords are not allowed. The CodeIgniter Shield config minimum and composition validators are aligned for future provisioning. This is an owner-directed usability/security trade-off; six-digit or common six-letter passwords are weak. MFA and throttling remain important but do not eliminate that risk.
+
+### Additional local recheck
+
+- On `/sign-in`, enter a sample password and click **Show**, then **Hide**. It must reveal/conceal the same characters and **not** submit the form.
+- On `/account/security`, independently toggle **Show / Hide** for current, new and confirmation fields. Keyboard Tab + Enter/Space should operate the buttons. Clicking one must not change the others.
+- On the disposable synthetic account, test changing the password to **six digits only** (e.g. choose a private value), then signing in with that password and a fresh TOTP. Next change it to **six letters only**, then to **six or more mixed characters**, using the existing current-password and MFA requirements each time.
+- A five-character new password must be rejected. A mismatched confirmation must be rejected. All prior sessions must still be invalidated on success. Confirm `php spark iedpu:p2-audit-verify` succeeds.
+- Prefer a **longer unique password** for any real deployment even though six characters are now technically permitted. Do not share real or synthetic passwords in chat or screenshots.
+
+**Acceptance:** initial password-change flow owner-accepted; new Show/Hide and six-character policy await local recheck. Session-expiry policy acceptance is a separate open gate.
