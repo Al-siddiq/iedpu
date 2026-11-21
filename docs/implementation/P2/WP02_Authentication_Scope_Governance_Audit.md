@@ -101,3 +101,9 @@ The [two-browser manual acceptance runbook](P2_WP02_Session_Revocation_Acceptanc
 ## Automatic session expiry increment — committed, owner acceptance pending (21 November 2026)
 
 The next WP02 security hardening increment enforces a provisional **30-minute idle** and **two-hour absolute** authenticated-session lifetime in `SessionVersion`, with an explicitly guarded local-disposable-DB-only timing override to make manual tests practical. See [Session Expiry Acceptance](P2_WP02_Session_Expiry_Acceptance.md) for the 40-second idle and 100-second absolute verification. No new migration or public privilege is added. The owner must approve the default policy and confirm manual results; this does not close WP02.
+
+## Authenticated password-change increment — committed, owner acceptance pending (21 November 2026)
+
+Implemented `GET /account/security` and `POST /api/v1/auth/password/change` for a fully authenticated user with a verified authenticator factor. The new `PasswordChange` service serialises concurrent changes using a locked Shield password identity and commits password hash replacement, cross-device session-version invalidation and the audit hash-chain event together. It cannot target a different user and does not grant privileges or enable public recovery. The existing synthetic MFA-only account is eligible to test its **own** password change without administrative rights.
+
+Manual runbook: [P2_WP02_Password_Change_Acceptance.md](P2_WP02_Password_Change_Acceptance.md). Invitation/activation, independent privileged recovery, owner-designated bootstrap, maker-checker approval execution, protected grants and WP03 mutations remain on hold. **The earlier session-expiry increment has not been separately owner-accepted; do not silently close that gate.**
