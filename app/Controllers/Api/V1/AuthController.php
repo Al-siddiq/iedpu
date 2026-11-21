@@ -8,6 +8,7 @@ use App\Libraries\Api\ApiInput;
 use App\Libraries\Api\ApiResponder;
 use App\Libraries\Auth\LoginIdentifier;
 use App\Libraries\Auth\ScopeAuthorizer;
+use App\Libraries\Auth\SessionVersion;
 use App\Libraries\Auth\VerifiedIdentifierResolver;
 use App\Libraries\Security\AuditTrail;
 use App\Libraries\Security\RequestId;
@@ -42,6 +43,11 @@ final class AuthController extends BaseController
             $resolver = new VerifiedIdentifierResolver($db);
             $policy = new ScopeAuthorizer($db);
             $userId = (int) $user->id;
+            if (!(new SessionVersion($db))->isCurrent($userId)) {
+                $auth->logout();
+                SessionVersion::clearLocal();
+                return ApiResponder::error($this->request, $this->response, 401, 'session_revoked', 'Your session has ended. Sign in again.');
+            }
             $hasFactor = $db->table('portal_totp_factors')->where('user_id', $userId)->countAllResults() > 0;
             $requiresMfa = $policy->requiresPendingMfa($userId) || $hasFactor;
             if (!$user->active || $user->isBanned() || !$resolver->hasVerifiedIdentifier($userId)
@@ -65,7 +71,16 @@ final class AuthController extends BaseController
     {
         $auth = auth('session');
         if ($auth->loggedIn()) {
-            return ApiResponder::error($this->request, $this->response, 409, 'already_authenticated', 'Sign out before starting another session.');
+            try {
+                $existing = $auth->user();
+                if ($existing !== null && (new SessionVersion(db_connect()))->isCurrent((int) $existing->id)) {
+                    return ApiResponder::error($this->request, $this->response, 409, 'already_authenticated', 'Sign out before starting another session.');
+                }
+                $auth->logout();
+                SessionVersion::clearLocal();
+            } catch (Throwable) {
+                return ApiResponder::error($this->request, $this->response, 503, 'auth_unavailable', 'Authentication is temporarily unavailable.');
+            }
         }
         $input = ApiInput::jsonObject($this->request, 4096);
         if (!$input['ok']) {
@@ -157,6 +172,7 @@ final class AuthController extends BaseController
             // Shield's supported session login method rotates the session ID.
             $stage = 'shield_session_creation';
             $auth->login($user);
+            (new SessionVersion($db))->stamp((int) $user->id);
 
             // Audit must be durable before an authenticated session is returned.
             $stage = 'login_audit';
@@ -180,8 +196,7 @@ final class AuthController extends BaseController
             } catch (Throwable) {
                 // Never let cleanup hide the original error or reveal details.
             }
-            session()->remove('iedpu_mfa_pending');
-            session()->remove('iedpu_mfa_verified_user');
+            SessionVersion::clearLocal();
             return ApiResponder::error($this->request, $this->response, 503, 'auth_unavailable', 'Authentication is temporarily unavailable.');
         }
     }
@@ -218,8 +233,7 @@ final class AuthController extends BaseController
             }
         }
         $auth->logout();
-        session()->remove('iedpu_mfa_pending');
-        session()->remove('iedpu_mfa_verified_user');
+        SessionVersion::clearLocal();
         return ApiResponder::success($this->request, $this->response, ['authenticated' => false]);
     }
 }
