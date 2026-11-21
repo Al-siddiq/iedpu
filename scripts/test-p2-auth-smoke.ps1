@@ -45,6 +45,8 @@ $null = Check-Status 'Unauthenticated session' '/api/v1/auth/session' 'GET' 401
 $unknown = 'unknown-' + [guid]::NewGuid().ToString('N') + '@example.invalid'
 $body = @{ identifier = $unknown; password = 'deliberately-invalid-password' } | ConvertTo-Json -Compress
 $null = Check-Status 'Login without CSRF' '/api/v1/auth/login' 'POST' 403 $body
+# Refresh after a failed CSRF attempt; never assume a token remains valid.
+$csrfJson = Check-Status 'CSRF refresh' '/api/v1/auth/csrf' 'GET' 200 | ConvertFrom-Json
 $headers = @{}
 $headers[[string]$csrfJson.data.header] = [string]$csrfJson.data.token
 $null = Check-Status 'Invalid login with CSRF' '/api/v1/auth/login' 'POST' 401 $body $headers
