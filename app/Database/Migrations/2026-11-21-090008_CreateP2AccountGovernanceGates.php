@@ -41,7 +41,6 @@ CREATE TABLE portal_account_action_tokens (
  purpose VARCHAR(30) NOT NULL,
  token_hash CHAR(64) NOT NULL,
  delivery_channel VARCHAR(10) NOT NULL,
- destination_hash CHAR(64) NOT NULL,
  status VARCHAR(20) NOT NULL DEFAULT 'pending',
  created_at DATETIME(6) NOT NULL,
  expires_at DATETIME(6) NOT NULL,
