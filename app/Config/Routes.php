@@ -26,6 +26,15 @@ $routes->group('api/v1', ['namespace' => 'App\\Controllers\\Api\\V1'], static fu
     $routes->get('health', 'SystemController::health');
     $routes->get('bootstrap', 'SystemController::bootstrap');
 
+    // WP02 initial, CSRF-protected session boundary. No default Shield routes,
+    // no self-registration, invitation, recovery, role or administrative CRUD.
+    $routes->get('auth/csrf', 'AuthController::csrf');
+    $routes->get('auth/session', 'AuthController::session');
+    $routes->post('auth/login', 'AuthController::login');
+    $routes->post('auth/logout', 'AuthController::logout');
+    $routes->add('auth', 'UnavailableController::disabled');
+    $routes->add('auth/(:any)', 'UnavailableController::disabled');
+
     // P2+ functions are deliberately unavailable. No temporary public CRUD,
     // membership enrolment, administrator or developer privilege is exposed.
     foreach ([
