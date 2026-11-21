@@ -59,7 +59,9 @@ final class P2TokenLifecycleCheck extends BaseCommand
             $three = $tokens->issueWithinTransaction($userId, $identifierId, 'password_reset');
             $superseded = $tokens->redeemWithinTransaction($two['token'], 'password_reset', $userId);
             $db->query(
-                'UPDATE portal_account_action_tokens SET expires_at=UTC_TIMESTAMP(6) - INTERVAL 1 SECOND
+                'UPDATE portal_account_action_tokens
+                 SET created_at=UTC_TIMESTAMP(6) - INTERVAL 2 HOUR,
+                     expires_at=UTC_TIMESTAMP(6) - INTERVAL 1 HOUR
                  WHERE public_id=?', [$three['public_id']]
             );
             $expired = $tokens->redeemWithinTransaction($three['token'], 'password_reset', $userId);
