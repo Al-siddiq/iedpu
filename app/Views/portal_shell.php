@@ -19,9 +19,11 @@
                 <span class="brand-name"><strong>IEDPU</strong><small>Northern Zone · Digital Portal</small></span>
             </a>
             <div class="topbar-actions">
-                <span class="connection-chip" :class="connectionClass" role="status">
-                    <span class="status-dot" aria-hidden="true"></span>{{ connectionLabel }}
-                </span>
+                <button type="button" class="connection-chip" :class="connectionClass"
+                    :disabled="checking" @click="refreshHealth" :aria-label="'Check connection. ' + connectionLabel"
+                    :title="connectionLabel">
+                    <span class="status-dot" aria-hidden="true"></span><span class="connection-label">{{ connectionLabel }}</span>
+                </button>
                 <a class="btn btn-outline-secondary btn-sm topbar-home" :href="href('/')" @click.prevent="navigate('/')">Public home</a>
             </div>
         </header>
