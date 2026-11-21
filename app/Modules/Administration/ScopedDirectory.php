@@ -108,7 +108,43 @@ final class ScopedDirectory
         if (in_array($kind, ['roles', 'permissions', 'offices'], true)) {
             return (new ScopeAuthorizer($this->db))->allows($userId, $permission, 'global');
         }
-        $result = $this->page($kind, $userId, 1, 1);
-        return $result['total'] > 0;
+        // Permission existence is independent of whether the directory has
+        // any rows. A valid empty organisation must show an empty state, not 403.
+        $resourceJoin = $kind === 'zones'
+            ? "INNER JOIN org_zones z ON z.id=a.zone_id AND z.is_project_scope=1 AND z.status='active'"
+            : "INNER JOIN org_zones z ON z.id=a.zone_id AND z.is_project_scope=1 AND z.status='active'";
+        $sql = "SELECT 1
+            FROM portal_user_role_assignments a
+            INNER JOIN portal_roles r ON r.id=a.role_id AND r.status='active'
+            INNER JOIN portal_role_permissions rp ON rp.role_id=r.id
+            INNER JOIN portal_permissions p ON p.id=rp.permission_id
+            " . $resourceJoin . "
+            WHERE a.user_id=? AND p.permission_key=? AND p.status='active'
+              AND a.assignment_status='active'
+              AND a.starts_at <= UTC_TIMESTAMP(6)
+              AND (a.expires_at IS NULL OR a.expires_at > UTC_TIMESTAMP(6))
+              AND a.scope_type='zone' AND a.branch_id IS NULL
+            LIMIT 1";
+        if ($this->db->query($sql, [$userId, $permission])->getRowArray() !== null) {
+            return true;
+        }
+        if ($kind === 'branches') {
+            $branchSql = "SELECT 1
+                FROM portal_user_role_assignments a
+                INNER JOIN portal_roles r ON r.id=a.role_id AND r.status='active'
+                INNER JOIN portal_role_permissions rp ON rp.role_id=r.id
+                INNER JOIN portal_permissions p ON p.id=rp.permission_id
+                INNER JOIN branches b ON b.id=a.branch_id
+                INNER JOIN org_zones z ON z.id=b.zone_id AND z.is_project_scope=1 AND z.status='active'
+                WHERE a.user_id=? AND p.permission_key=? AND p.status='active'
+                  AND a.assignment_status='active'
+                  AND a.starts_at <= UTC_TIMESTAMP(6)
+                  AND (a.expires_at IS NULL OR a.expires_at > UTC_TIMESTAMP(6))
+                  AND a.scope_type='branch'
+                  AND (a.zone_id IS NULL OR a.zone_id=z.id)
+                LIMIT 1";
+            return $this->db->query($branchSql, [$userId, $permission])->getRowArray() !== null;
+        }
+        return false;
     }
 }
