@@ -115,3 +115,37 @@ The WP01 branch contains the environment templates, environment-aware applicatio
 The local PHP 8.2.4 baseline was explicitly approved on 21 November 2026 after the original 8.4 preflight blocked the user's installed XAMPP environment. Upstream CodeIgniter 4.7.6 and Shield 1.4.1 both declare PHP ^8.2. The Composer project constraint is ^8.2.4. This exception avoids upgrading XAMPP during P1-WP01; it does not approve an unpatched PHP 8.2.4 server for staging or production. Before exposing real member information, move to a supported, security-patched PHP runtime and repeat Composer/platform checks.
 
 **After pulling the corrected WP01 branch:** run `powershell -ExecutionPolicy Bypass -File scripts/bootstrap-windows.ps1 -PhpPath C:\xampp\php\php.exe`. Do **not** run `composer install` until Composer has regenerated `composer.lock` using `composer update`. When the script passes, commit only the generated `composer.lock` and share the non-sensitive terminal results for WP01 acceptance. Never commit `.env` or `vendor/`.
+
+
+## P1-WP03 — Mobile-first portal preview
+
+The P1 branch now includes a responsive public landing page and four read-only
+workspace previews for members, branch officers, Committee administrators and
+the separate developer/technical team. The real login, registration, branch
+administration, finance and official ID functions remain disabled until their
+approved later phases.
+
+The Bootstrap 5.3.9 CSS and JS production files are committed locally. Install
+the pinned Vue 3.5.24 production global build on your connected Windows PC:
+
+```bat
+cd C:\xampp\htdocs\iedpu
+git pull --ff-only origin feature/p1-wp01-environment-bootstrap
+powershell -ExecutionPolicy Bypass -File scripts/install-frontend-vendors.ps1
+C:\xampp\php\php.exe spark serve --host 127.0.0.1 --port 8080
+```
+
+Open `http://127.0.0.1:8080/` and use the portal navigation to inspect all
+five areas. After checking the generated local vendor asset, commit it:
+
+```bat
+git add public/assets/js/vendor/vue.global.prod.js
+git commit -m "build(p1-wp03): lock local Vue 3.5.24 production asset"
+git push origin feature/p1-wp01-environment-bootstrap
+```
+
+Runtime scripts and styles are served from `public/assets/` — there is no
+production CDN dependency or JavaScript build tool. The complete manual review
+and accessibility checklist is in
+`docs/implementation/P1/WP03_Mobile_First_Frontend_Shells.md`.
+
