@@ -6,8 +6,8 @@
 
 ## 1. Delivered
 
-- Relative-scope web manifest with standalone display, theme, and 192/512 SVG icons. These are provisional portal marks, not an assertion of an official IEDPU logo. Installation availability varies by browser; target Android Chrome installation must be verified.
-- Service worker at `public/sw.js`: version `p1-wp04-001`, local static public allowlist pre-cached at install; same-origin GET only. Network-first public navigation, static offline fallback upon network failure, no server-rendered HTML cached. Public static assets use network first with installed-cache fallback. No runtime cache writes.
+- Relative-scope web manifest with standalone display, theme, and official-logo 192/512 PNGs plus a separate maskable 512 PNG. Raster generation on the development PC is pending. Installation availability varies by browser; target Android Chrome installation must be verified.
+- Service worker at `public/sw.js`: version `p1-wp04-002`, local static public allowlist pre-cached at install; same-origin GET only. Network-first public navigation, static offline fallback upon network failure, no server-rendered HTML cached. Public static assets use network first with installed-cache fallback. No runtime cache writes.
 - Only the public homepage and four preview paths receive the navigation fallback. API, login, registration, finance, private/admin pages, query URLs and all unlisted requests bypass worker handling. No authenticated responses or personal records are written to Cache Storage.
 - Locally hosted Dexie 4.2.1, Vue 3.5.24, Bootstrap 5.3.9 with license notices. Public IndexedDB schema version 1 holds only a fixed schema marker. Private offline feature flag is false. No profile/queue schema, tokens, user data, sync or mutation operations. A module-level helper can delete this public metadata database; browser site-data controls can also clear it.
 - Browser installation prompt when supported, update notice for waiting workers and user-initiated activation/reload. No unconditional skipWaiting on install. Old application caches removed by scope-specific prefix. Browser lifecycle may also activate a waiting worker after old tabs close.
@@ -65,3 +65,19 @@ No source inspection constitutes a human browser or staging test. No automated t
 Bump the worker VERSION for every shell/static allowlist change; never reuse a live cache version. Deploy an internally consistent release (prefer atomic directory/symlink switch), not individual asset changes on live service. Public caches are scope-isolated; do not delete unrelated origins or caches. If rollback is needed, publish previous reviewed source with a fresh worker version so clients can update; isolated browser site data can be cleared for recovery. Future private offline data will need explicit retention, consent, logout/device cleanup, encryption review and schema-preserving updates before activation.
 
 See `P1_Hosting_and_Deployment_Runbook.md` for the deployment gate.
+
+
+## 6. Owner-requested final branding refinement
+
+Bootstrap Icons 1.13.1 selected SVG symbols are self-hosted in public/assets/icons/bootstrap-icons.svg with MIT license; the public preview navigation, cards, notices and actions use SVG rather than decorative glyphs. The official public/assets/IEDPU.png is used unchanged in the header and offline page. No CDN or icon font needed.
+
+The GitHub connection cannot read the binary PNG for raster conversion. Run the committed Windows generator before opening the latest PWA:
+
+```bat
+powershell -ExecutionPolicy Bypass -File scripts/generate-brand-assets.ps1
+git add public/assets/icons/favicon-16.png public/assets/icons/favicon-32.png public/assets/icons/favicon-48.png public/assets/icons/apple-touch-icon.png public/assets/icons/portal-192.png public/assets/icons/portal-512.png public/assets/icons/portal-maskable-512.png public/favicon.ico
+git commit -m "build(p1): commit official IEDPU PWA and favicon assets"
+git push origin feature/p1-wp01-environment-bootstrap
+```
+
+The script creates 7 PNGs plus a multi-resolution ICO using proportional contain sizing and white backing; maskable artwork fits inside the safe circle. All eight are required for the updated worker to install. Regenerate when the official source changes and bump the worker version. Verify dimensions, appearance, maskable crop preview, mobile/desktop navigation icons, local sprite network request, offline logo, cache contents and installed icon after update. Existing installed shortcuts may require uninstall/reinstall to show a changed OS icon. Record actual results before P1 closure. No private data caching changes.
