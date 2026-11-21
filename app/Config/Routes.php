@@ -14,6 +14,11 @@ $routes->get('preview/branch', 'Home::index');
 $routes->get('preview/committee', 'Home::index');
 $routes->get('preview/technical', 'Home::index');
 
+// Read-only, source-derived 2015 Constitution reader. Public preview only;
+// authentication and member-only visibility are deferred to WP02 policy.
+$routes->get('constitution/2015', 'Constitution::index');
+$routes->get('constitution/2015/(:segment)', 'Constitution::show/$1');
+
 // P1-WP02: All API routes are explicitly declared; auto-routing is disabled.
 // Do not mount Shield's default login/register routes until P2 has configured
 // authentication, invitation-only account creation, and role-scoped access.
