@@ -73,7 +73,45 @@ final class P2AuthFixture extends BaseCommand
                 'verified_at' => $now,
                 'status' => 'active',
                 'created_at' => $now,
-            ]) || !$db->transStatus() || !$db->transCommit()) {
+            ])) {
+                throw new RuntimeException('Fixture identifier insert failed.');
+            }
+            if (CLI::getOption('with-mfa-role') !== null) {
+                // Synthetic role with ZERO permissions. Its only purpose is
+                // to trigger the real privileged TOTP challenge on local DB.
+                if ($db->table('portal_roles')->where('role_code', 'synthetic_mfa_only')->countAllResults() > 0) {
+                    throw new RuntimeException('Synthetic MFA role already exists.');
+                }
+                if (!$db->table('portal_roles')->insert([
+                    'role_code' => 'synthetic_mfa_only',
+                    'role_name' => 'Synthetic MFA Acceptance Fixture (NO PERMISSIONS)',
+                    'description' => 'Disposable development database only. Never production.',
+                    'is_system_role' => 0, 'is_assignable' => 0,
+                    'requires_second_approval' => 0, 'status' => 'active',
+                    'created_at' => $now,
+                ])) {
+                    throw new RuntimeException('Fixture role insert failed.');
+                }
+                $roleId = (int) $db->insertID();
+                $b = random_bytes(16);
+                $b[6] = chr((ord($b[6]) & 15) | 64);
+                $b[8] = chr((ord($b[8]) & 63) | 128);
+                $h = bin2hex($b);
+                $roleAssignmentUuid = substr($h,0,8) . '-' . substr($h,8,4) . '-'
+                    . substr($h,12,4) . '-' . substr($h,16,4) . '-' . substr($h,20);
+                if (!$db->table('portal_user_role_assignments')->insert([
+                    'public_id' => $roleAssignmentUuid,
+                    'user_id' => $id, 'role_id' => $roleId,
+                    'scope_type' => 'global',
+                    'starts_at' => $now, 'assignment_status' => 'active',
+                    'assignment_reason' => 'SYNTHETIC LOCAL MFA TEST ONLY; NO PERMISSIONS',
+                    'assigned_by_user_id' => $id,
+                    'created_at' => $now,
+                ])) {
+                    throw new RuntimeException('Fixture role assignment failed.');
+                }
+            }
+            if (!$db->transStatus() || !$db->transCommit()) {
                 throw new RuntimeException('Fixture transaction failed.');
             }
         } catch (\Throwable $error) {
@@ -82,6 +120,9 @@ final class P2AuthFixture extends BaseCommand
             return 1;
         }
         CLI::write('Synthetic phone-only test account created. NEVER send SMS to this number.', 'green');
+        if (CLI::getOption('with-mfa-role') !== null) {
+            CLI::write('Synthetic zero-permission MFA role assigned. Use QR enrolment flow.', 'yellow');
+        }
         CLI::write('Identifier: ' . $phone);
         CLI::write('One-time test password (do not copy to chat, screenshots, or logs): ' . $password);
         CLI::write('Destroy the disposable test database after acceptance.');
