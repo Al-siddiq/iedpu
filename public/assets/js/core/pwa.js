@@ -6,6 +6,7 @@ const update = document.getElementById('pwa-update');
 const install = document.getElementById('pwa-install');
 let promptEvent;
 let acceptedUpdate = false;
+document.getElementById('pwa-dismiss').addEventListener('click', () => { panel.hidden = true; });
 function announce(text) { panel.hidden = false; message.textContent = text; }
 window.addEventListener('beforeinstallprompt', event => {
     event.preventDefault();
