@@ -24,7 +24,7 @@ final class ApiInput
             return self::invalid('content_type', 'Content-Type must be application/json.');
         }
 
-        $body = $request->getBody();
+        $body = (string) $request->getBody();
         if (strlen($body) > $maxBytes) {
             return self::invalid('body', 'JSON request body exceeds the allowed size.');
         }
