@@ -1,6 +1,8 @@
 import { PortalAuthClient } from '../core/auth-client.js';
+import { initPasswordVisibility } from '../core/password-visibility.js';
 
 const client = new PortalAuthClient(document.documentElement.dataset.baseUrl);
+const resetPasswordVisibility = initPasswordVisibility();
 const $ = id => document.getElementById(id);
 const loginForm = $('login-form');
 const mfaSection = $('mfa-section');
@@ -14,6 +16,7 @@ const mfaButton = $('mfa-submit');
 function message(value) { notice.textContent = value || ''; }
 function clearSecrets() {
   $('password').value = '';
+  resetPasswordVisibility();
   $('mfa-code').value = '';
   $('setup-key').textContent = '';
   $('recovery-codes').textContent = '';
@@ -55,6 +58,7 @@ loginForm.addEventListener('submit', async event => {
     const password = $('password').value;
     const result = await client.login(identifier, password);
     $('password').value = '';
+    resetPasswordVisibility();
     if (!result.success) {
       message(errorText(result));
       return;
