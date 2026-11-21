@@ -16,6 +16,13 @@ final class SessionVersion
 {
     private const SESSION_KEY = 'iedpu_session_version';
     private const SESSION_USER = 'iedpu_session_version_user';
+    private const ISSUED_AT = 'iedpu_session_issued_at';
+    private const LAST_SEEN_AT = 'iedpu_session_last_seen_at';
+
+    // P2 provisional policy: 30 minutes idle, two hours maximum.
+    // The underlying CI4 session expiration is also 7,200 seconds.
+    private const IDLE_SECONDS = 1800;
+    private const ABSOLUTE_SECONDS = 7200;
 
     public function __construct(private readonly BaseConnection $db)
     {
@@ -49,6 +56,9 @@ final class SessionVersion
         }
         session()->set(self::SESSION_USER, $userId);
         session()->set(self::SESSION_KEY, (string) $row['session_version']);
+        $now = time();
+        session()->set(self::ISSUED_AT, $now);
+        session()->set(self::LAST_SEEN_AT, $now);
     }
 
     /** Fail closed when the stamp is absent, malformed, stale or revoked. */
@@ -63,7 +73,59 @@ final class SessionVersion
         }
         $row = $this->db->table('portal_user_session_versions')
             ->select('session_version')->where('user_id', $userId)->get()->getRowArray();
-        return $row !== null && hash_equals((string) $row['session_version'], $version);
+        if ($row === null || !hash_equals((string) $row['session_version'], $version)) {
+            return false;
+        }
+
+        // Enforce both idle and absolute expiry on the server, not via JS.
+        // Missing timestamps (including pre-upgrade sessions) fail closed.
+        $issued = session()->get(self::ISSUED_AT);
+        $last = session()->get(self::LAST_SEEN_AT);
+        $now = time();
+        if (!is_int($issued) || !is_int($last)
+            || $issued <= 0 || $last < $issued || $last > $now || $issued > $now) {
+            return false;
+        }
+        [$idle, $absolute] = $this->limits();
+        if ($now - $last >= $idle || $now - $issued >= $absolute) {
+            return false;
+        }
+
+        // Refresh idle timer only after the version and both clocks pass.
+        // The absolute clock is NEVER refreshed by subsequent requests.
+        session()->set(self::LAST_SEEN_AT, $now);
+        return true;
+    }
+
+    /**
+     * A short-lived local-only timing override for manual acceptance.
+     * Requires explicit synthetic-fixture opt-in AND a disposable local DB.
+     * Production, staging and nonlocal databases always use fixed policy.
+     *
+     * @return array{int,int} [idle seconds, absolute seconds]
+     */
+    private function limits(): array
+    {
+        $defaults = [self::IDLE_SECONDS, self::ABSOLUTE_SECONDS];
+        if (ENVIRONMENT !== 'development'
+            || (string) env('IEDPU_ALLOW_SYNTHETIC_AUTH', '0') !== '1'
+            || !in_array((string) $this->db->hostname, ['localhost', '127.0.0.1', '::1'], true)
+            || !preg_match('/\Aiedpu_(?:dev|test|local|disposable)[a-z0-9_]*\z/iD', (string) $this->db->database)) {
+            return $defaults;
+        }
+        $idleRaw = (string) env('IEDPU_SESSION_TEST_IDLE_SECONDS', '');
+        $absoluteRaw = (string) env('IEDPU_SESSION_TEST_ABSOLUTE_SECONDS', '');
+        if (!preg_match('/\A[0-9]{2,4}\z/D', $idleRaw)
+            || !preg_match('/\A[0-9]{2,4}\z/D', $absoluteRaw)) {
+            return $defaults;
+        }
+        $idle = (int) $idleRaw;
+        $absolute = (int) $absoluteRaw;
+        if ($idle < 30 || $idle > 600 || $absolute < 60
+            || $absolute > 1200 || $absolute <= $idle) {
+            return $defaults;
+        }
+        return [$idle, $absolute];
     }
 
     /**
@@ -88,6 +150,8 @@ final class SessionVersion
     {
         session()->remove(self::SESSION_KEY);
         session()->remove(self::SESSION_USER);
+        session()->remove(self::ISSUED_AT);
+        session()->remove(self::LAST_SEEN_AT);
         session()->remove('iedpu_mfa_verified_user');
         session()->remove('iedpu_mfa_pending');
     }
