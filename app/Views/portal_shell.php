@@ -69,6 +69,7 @@
                                 <div class="hero-actions">
                                     <a class="btn btn-light btn-lg" :href="href('/preview/member')" @click.prevent="navigate('/preview/member')">Explore member portal <svg class="bi" aria-hidden="true" focusable="false"><use href="<?= esc(base_url('assets/icons/bootstrap-icons.svg'), 'attr') ?>#arrow-right"></use></svg></a>
                                     <a class="hero-text-link" :href="href('/preview/committee')" @click.prevent="navigate('/preview/committee')">See how administration works <svg class="bi" aria-hidden="true" focusable="false"><use href="<?= esc(base_url('assets/icons/bootstrap-icons.svg'), 'attr') ?>#arrow-right"></use></svg></a>
+                                    <a class="hero-text-link" href="<?= esc(base_url('constitution/2015'), 'attr') ?>">Read the 2015 Constitution <svg class="bi" aria-hidden="true" focusable="false"><use href="<?= esc(base_url('assets/icons/bootstrap-icons.svg'), 'attr') ?>#book"></use></svg></a>
                                 </div>
                             </div>
                             <div class="hero-art" aria-hidden="true">
