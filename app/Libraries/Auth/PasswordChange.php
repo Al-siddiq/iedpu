@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Libraries\Auth;
 
+use App\Libraries\Security\AtomicAuditedMutation;
 use App\Libraries\Security\AuditTrail;
 use App\Libraries\Security\RequestId;
 use CodeIgniter\Database\BaseConnection;
@@ -38,8 +39,9 @@ final class PasswordChange
             return 'same';
         }
 
-        $this->db->transBegin();
-        try {
+        // Hold the audit-chain advisory lock until the OUTER transaction
+        // commits, not merely until AuditTrail's nested append returns.
+        return (new AtomicAuditedMutation($this->db))->run(function () use ($userId, $current, $next): string {
             // Serialize concurrent changes and re-check the current hash
             // INSIDE the transaction; only one competing rotation can win.
             $rows = $this->db->query(
@@ -55,15 +57,12 @@ final class PasswordChange
             }
             $identity = $rows[0];
             if (!is_string($identity['secret2']) || !password_verify($current, $identity['secret2'])) {
-                $this->db->transRollback();
                 return 'incorrect';
             }
             if (password_verify($next, $identity['secret2'])) {
-                $this->db->transRollback();
                 return 'same';
             }
-            // Shield uses PHP-compatible password hashes. No raw passwords
-            // are persisted or written to audit, telemetry or logs.
+            // Shield-compatible PHP password hash; no credentials in logs.
             $hash = password_hash($next, PASSWORD_DEFAULT);
             if (!is_string($hash) || !$this->db->table('auth_identities')
                 ->where('id', $identity['id'])->update(['secret2' => $hash])) {
@@ -78,13 +77,10 @@ final class PasswordChange
                 'actor_user_id' => $userId,
                 'request_id' => RequestId::current(),
             ]);
-            if (!$this->db->transStatus() || !$this->db->transCommit()) {
+            if (!$this->db->transStatus()) {
                 throw new RuntimeException('Password transaction failed.');
             }
             return 'changed';
-        } catch (\Throwable $exception) {
-            $this->db->transRollback();
-            throw $exception;
-        }
+        });
     }
 }
