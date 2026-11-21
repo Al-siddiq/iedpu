@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-require dirname(__DIR__) . '/app/Libraries/Auth/LoginIdentifier.php';
-
 use App\Libraries\Auth\LoginIdentifier;
+
+require dirname(__DIR__) . '/app/Libraries/Auth/LoginIdentifier.php';
 
 $cases = [
     ['08000000000', 'phone', '+2348000000000'],
