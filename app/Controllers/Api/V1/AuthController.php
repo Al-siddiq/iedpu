@@ -46,17 +46,19 @@ final class AuthController extends BaseController
             if (!(new SessionVersion($db))->isCurrent($userId)) {
                 $auth->logout();
                 SessionVersion::clearLocal();
-                return ApiResponder::error($this->request, $this->response, 401, 'session_revoked', 'Your session has ended. Sign in again.');
+                return ApiResponder::error($this->request, $this->response, 401, 'session_ended', 'Your session has ended. Sign in again.');
             }
             $hasFactor = $db->table('portal_totp_factors')->where('user_id', $userId)->countAllResults() > 0;
             $requiresMfa = $policy->requiresPendingMfa($userId) || $hasFactor;
             if (!$user->active || $user->isBanned() || !$resolver->hasVerifiedIdentifier($userId)
                 || ($requiresMfa && (int) session()->get('iedpu_mfa_verified_user') !== $userId)) {
                 $auth->logout();
+                SessionVersion::clearLocal();
                 return ApiResponder::error($this->request, $this->response, 401, 'unauthenticated', 'Authentication required.');
             }
         } catch (Throwable) {
             $auth->logout();
+            SessionVersion::clearLocal();
             return ApiResponder::error($this->request, $this->response, 503, 'auth_unavailable', 'Authentication is temporarily unavailable.');
         }
         return ApiResponder::success($this->request, $this->response, [
