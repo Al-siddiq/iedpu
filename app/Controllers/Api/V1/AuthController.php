@@ -11,6 +11,7 @@ use App\Libraries\Auth\ScopeAuthorizer;
 use App\Libraries\Auth\VerifiedIdentifierResolver;
 use App\Libraries\Security\AuditTrail;
 use App\Libraries\Security\RequestId;
+use App\Libraries\Security\SecurityEventWriter;
 use CodeIgniter\HTTP\ResponseInterface;
 use Throwable;
 
@@ -92,10 +93,15 @@ final class AuthController extends BaseController
             return ApiResponder::error($this->request, $this->response, 503, 'auth_unavailable', 'Authentication is temporarily unavailable.');
         }
 
-        $failure = static fn (self $controller): ResponseInterface => ApiResponder::error(
-            $controller->request, $controller->response, 401, 'invalid_credentials',
-            'The supplied credentials could not be verified.'
-        );
+        $failure = static function (self $controller): ResponseInterface {
+            try {
+                (new SecurityEventWriter(db_connect()))->record('auth.login_denied');
+            } catch (Throwable) {
+                // Security telemetry is best-effort on denied attempts.
+            }
+            return ApiResponder::error($controller->request, $controller->response,
+                401, 'invalid_credentials', 'The supplied credentials could not be verified.');
+        };
         try {
             $db = db_connect();
             $resolver = new VerifiedIdentifierResolver($db);
