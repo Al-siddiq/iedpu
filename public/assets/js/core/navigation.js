@@ -38,7 +38,7 @@ export function createNavigation(baseUrl, onChange) {
             window.history.pushState({ portalPreview: true }, '', target);
         }
         onChange(path);
-        window.scrollTo({ top: 0, behavior: 'instant' });
+        window.scrollTo({ top: 0, behavior: 'auto' });
         return true;
     }
 
