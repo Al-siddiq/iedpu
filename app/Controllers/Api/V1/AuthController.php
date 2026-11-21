@@ -41,8 +41,11 @@ final class AuthController extends BaseController
             $db = db_connect();
             $resolver = new VerifiedIdentifierResolver($db);
             $policy = new ScopeAuthorizer($db);
-            if (!$user->active || $user->isBanned() || !$resolver->hasVerifiedIdentifier((int) $user->id)
-                || $policy->requiresPendingMfa((int) $user->id)) {
+            $userId = (int) $user->id;
+            $hasFactor = $db->table('portal_totp_factors')->where('user_id', $userId)->countAllResults() > 0;
+            $requiresMfa = $policy->requiresPendingMfa($userId) || $hasFactor;
+            if (!$user->active || $user->isBanned() || !$resolver->hasVerifiedIdentifier($userId)
+                || ($requiresMfa && (int) session()->get('iedpu_mfa_verified_user') !== $userId)) {
                 $auth->logout();
                 return ApiResponder::error($this->request, $this->response, 401, 'unauthenticated', 'Authentication required.');
             }
@@ -53,7 +56,7 @@ final class AuthController extends BaseController
         return ApiResponder::success($this->request, $this->response, [
             'authenticated' => true,
             'privileged_access' => false,
-            'mfa_available' => false,
+            'mfa_verified' => $requiresMfa,
             'administration_available' => false,
         ]);
     }
@@ -111,16 +114,10 @@ final class AuthController extends BaseController
                 password_verify($password, '$2y$12$EXhOo8gFQXW..a4NsOZfZOvPlGsfn6CFkOdokoAo8mRPfltDBQCSi');
                 return $failure($this);
             }
-            $policy = new ScopeAuthorizer($db);
-            if ($policy->requiresPendingMfa($resolved['user_id'])) {
-                // Privileged login remains blocked until real MFA is approved.
-                // Keep a password-hash cost on this denied path as well.
-                password_verify($password, '$2y$12$EXhOo8gFQXW..a4NsOZfZOvPlGsfn6CFkOdokoAo8mRPfltDBQCSi');
-                return $failure($this);
-            }
-            // Shield::check verifies its password hash and rehashes as needed,
-            // without storing the raw email/phone in Shield's auth_logins table.
-            // Only the resolved, verified Shield identity may be checked.
+            // Verify the Shield password BEFORE determining the second factor.
+            // This avoids revealing whether an identifier belongs to an officer.
+            // Shield::check does not log the submitted raw identifier.
+
             $result = $auth->check(['email' => $resolved['shield_secret'], 'password' => $password]);
             if (!$result->isOK()) {
                 return $failure($this);
@@ -129,6 +126,26 @@ final class AuthController extends BaseController
             if ($user === null || (int) $user->id !== $resolved['user_id']
                 || !$user->active || $user->isBanned()) {
                 return $failure($this);
+            }
+            $policy = new ScopeAuthorizer($db);
+            $hasFactor = $db->table('portal_totp_factors')->where('user_id', (int) $user->id)->countAllResults() > 0;
+            if ($policy->requiresPendingMfa((int) $user->id) || $hasFactor) {
+                // Password verification is NOT an authenticated Shield session.
+                // Bind a short-lived challenge to this server-side session only.
+                new \\App\\Libraries\\Auth\\TotpFactor($db); // fail closed if MFA key is missing
+                session()->regenerate(true);
+                session()->remove('iedpu_mfa_verified_user');
+                session()->set('iedpu_mfa_pending', [
+                    'user_id' => (int) $user->id,
+                    'created_at' => time(),
+                    'mode' => $hasFactor ? 'challenge' : 'enrol',
+                ]);
+                return ApiResponder::success($this->request, $this->response, [
+                    'authenticated' => false,
+                    'mfa_required' => true,
+                    'enrolment_required' => !$hasFactor,
+                    'next' => $hasFactor ? 'auth/mfa/verify' : 'auth/mfa/setup',
+                ], 202);
             }
             // Shield's supported session login method rotates the session ID.
             $auth->login($user);
@@ -172,6 +189,8 @@ final class AuthController extends BaseController
             }
         }
         $auth->logout();
+        session()->remove('iedpu_mfa_pending');
+        session()->remove('iedpu_mfa_verified_user');
         return ApiResponder::success($this->request, $this->response, ['authenticated' => false]);
     }
 }
