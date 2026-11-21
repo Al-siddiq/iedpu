@@ -30,7 +30,7 @@ final class MfaController extends BaseController
         if (!is_array($pending) || !isset($pending['user_id'], $pending['created_at'], $pending['mode'])
             || !is_int($pending['user_id']) || $pending['user_id'] < 1
             || !is_int($pending['created_at']) || $pending['created_at'] > time()
-            || time() - $pending['created_at'] > 300
+            || time() - $pending['created_at'] > ($pending['mode'] === 'enrol' ? 900 : 300)
             || !in_array($pending['mode'], ['enrol','challenge'], true)) {
             session()->remove('iedpu_mfa_pending');
             return null;
@@ -62,7 +62,7 @@ final class MfaController extends BaseController
                 'manual_key' => $secret,
                 'otpauth_uri' => $factor->provisioningUri($pending['user_id'], $secret),
                 'instructions' => 'Open a compatible authenticator app, add an account using this setup key or QR, then enter its six-digit code. Keep recovery codes offline.',
-                'expires_in_seconds' => max(0, 300 - (time() - $pending['created_at'])),
+                'expires_in_seconds' => max(0, 900 - (time() - $pending['created_at'])),
             ]);
         } catch (Throwable) {
             return $this->error(503, 'mfa_unavailable', 'Authenticator setup is temporarily unavailable.');
