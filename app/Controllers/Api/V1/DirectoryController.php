@@ -6,6 +6,7 @@ namespace App\Controllers\Api\V1;
 use App\Controllers\BaseController;
 use App\Libraries\Api\ApiResponder;
 use App\Libraries\Auth\ScopeAuthorizer;
+use App\Libraries\Auth\SessionVersion;
 use App\Libraries\Auth\VerifiedIdentifierResolver;
 use App\Libraries\Security\AuditTrail;
 use App\Libraries\Security\RequestId;
@@ -40,11 +41,13 @@ final class DirectoryController extends BaseController
             $id = (int) $user->id;
             $fresh = $db->table('users')->select('active')->where('id', $id)->get()->getRowArray();
             $policy = new ScopeAuthorizer($db);
-            if ($fresh === null || (int) $fresh['active'] !== 1 || $user->isBanned()
+            if (!(new SessionVersion($db))->isCurrent($id)
+                || $fresh === null || (int) $fresh['active'] !== 1 || $user->isBanned()
                 || !(new VerifiedIdentifierResolver($db))->hasVerifiedIdentifier($id)
                 || (int) session()->get('iedpu_mfa_verified_user') !== $id
                 || !$policy->requiresPendingMfa($id)) {
                 $auth->logout();
+                SessionVersion::clearLocal();
                 return ApiResponder::error($this->request, $this->response, 401, 'unauthenticated', 'Sign in with your authenticator to continue.');
             }
             $directory = new ScopedDirectory($db);
