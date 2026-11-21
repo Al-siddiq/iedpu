@@ -199,7 +199,9 @@ final class P2InvitationIssuerAcceptanceCheck extends BaseCommand
             CLI::write('HOLD: Synthetic grant and audit records remain; DESTROY disposable database after acceptance.', 'yellow');
             return 0;
         } catch (Throwable $error) {
-            if ($db->transDepth > 0) {
+            // Roll back only a still-open transaction on this connection.
+            $state = $db->query('SELECT @@in_transaction AS active')->getRowArray();
+            if ((int) ($state['active'] ?? 0) === 1) {
                 $db->transRollback();
             }
             CLI::write('FAIL: invitation issuer acceptance (' . get_class($error) . ': ' . $error->getMessage() . ').', 'red');
