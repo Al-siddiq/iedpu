@@ -157,3 +157,7 @@ All local vendors (Vue 3.5.24, Bootstrap 5.3.9 and Dexie 4.2.1) are committed. P
 ### Final P1 branding assets (required before starting the updated worker)
 
 After pulling the final branding refinement, run `powershell -ExecutionPolicy Bypass -File scripts/generate-brand-assets.ps1` on Windows. This produces the official IEDPU logo-derived raster icons and favicon from the committed public/assets/IEDPU.png without network access. Commit the eight generated files listed in WP04 documentation. The SVG Bootstrap Icons 1.13.1 sprite is already committed, no separate download required. The updated Service Worker will not install until all eight raster outputs exist.
+
+## P2-WP01 — Database foundation
+
+Follow [WP01 migration and manual verification runbook](docs/implementation/P2/WP01_Database_Foundation.md) on an isolated local DB. Official vendor migrations and 22 app tables; seed only the release-controlled permission catalogue. Authentication and all business routes remain disabled until WP02+. No real data or production deployment.
