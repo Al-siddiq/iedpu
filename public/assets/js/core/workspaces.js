@@ -69,11 +69,11 @@ export const workspaces = Object.freeze({
 });
 
 export const navigationItems = Object.freeze([
-    { path: '/', label: 'Public home', shortLabel: 'Home', symbol: '⌂', preview: false },
-    { path: '/preview/member', label: 'Member portal', shortLabel: 'Member', symbol: '◎', preview: true },
-    { path: '/preview/branch', label: 'Branch administration', shortLabel: 'Branch', symbol: '▦', preview: true },
-    { path: '/preview/committee', label: 'Committee administration', shortLabel: 'Committee', symbol: '◇', preview: true },
-    { path: '/preview/technical', label: 'Technical administration', shortLabel: 'Technical', symbol: '⚙', preview: true },
+    { path: '/', label: 'Public home', shortLabel: 'Home', icon: 'house-door', preview: false },
+    { path: '/preview/member', label: 'Member portal', shortLabel: 'Member', icon: 'person-circle', preview: true },
+    { path: '/preview/branch', label: 'Branch administration', shortLabel: 'Branch', icon: 'people', preview: true },
+    { path: '/preview/committee', label: 'Committee administration', shortLabel: 'Committee', icon: 'building', preview: true },
+    { path: '/preview/technical', label: 'Technical administration', shortLabel: 'Technical', icon: 'gear', preview: true },
 ]);
 
 export const previewCards = Object.freeze([
