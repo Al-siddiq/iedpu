@@ -87,13 +87,17 @@ The PowerShell script checks health 200, CSRF 200, anonymous session 401, missin
 - **Privileged MFA**: authenticator-app TOTP setup, challenge, anti-replay and one-use recovery codes are implemented, pending manual acceptance. Independently authorised lost-device recovery, MFA reset/revocation and high-risk step-up remain disabled until approved.
 - **Governance**: immutable bound maker-checker approval service, target-state concurrency, protected role edit/assignment/revocation, actor/target grant ceiling, self-elevation prevention, one-time audited bootstrap, and transactionally coupled business mutation+audit. Initial real Committee Super Administrator and technical operator remain HOLD-01.
 - **Authorised APIs**: route guard integration, scoped query filtering and role/approval/technical operations, denial audit, and privacy-controlled audit retrieval. No live privileged CRUD yet.
-- **Security hardening**: shared session revocation state, server-enforced idle/absolute expiry, robust session fixation testing, rate limiter storage in staging, full event taxonomy and external audit checkpoints in WP04.
+- **Security hardening**: account-wide session revocation is owner-accepted; server-enforced idle/absolute expiry is committed and awaiting manual acceptance. Robust session fixation testing, rate limiter storage in staging, full event taxonomy and external audit checkpoints in WP04 remain outstanding.
 - **Testing**: automated integration tests and full manual acceptance against actual local/staging infrastructure.
 
 **Do not accept WP02 as complete based on this first increment.** Do not merge PR #3 or deploy real accounts until all WP02 exit gates have passed.
 
-## Session revocation increment — committed, owner acceptance pending (21 November 2026)
+## Session revocation increment — OWNER ACCEPTED (21 November 2026)
 
 The owner has accepted the **first read-only WP03 directory increment**. The implementation sequence has returned to an outstanding WP02 prerequisite: cross-device session invalidation. A new `portal_user_session_versions` table, `SessionVersion` service, Shield-login/MFA session stamping, per-request protected-session validation, and a local-only synthetic-account revocation command are committed.
 
-The [two-browser manual acceptance runbook](P2_WP02_Session_Revocation_Acceptance.md) is the binding test for this increment. This change **does not** provide production administrator revocation, secure invitations, account recovery, independent approvals or protected role grants. Do not interpret a successful lint run as manual acceptance.
+The [two-browser manual acceptance runbook](P2_WP02_Session_Revocation_Acceptance.md) records the owner's revocation confirmation and its manual verification procedure. This change **does not** provide production administrator revocation, secure invitations, account recovery, independent approvals or protected role grants. Do not interpret a successful lint run as manual acceptance.
+
+## Automatic session expiry increment — committed, owner acceptance pending (21 November 2026)
+
+The next WP02 security hardening increment enforces a provisional **30-minute idle** and **two-hour absolute** authenticated-session lifetime in `SessionVersion`, with an explicitly guarded local-disposable-DB-only timing override to make manual tests practical. See [Session Expiry Acceptance](P2_WP02_Session_Expiry_Acceptance.md) for the 40-second idle and 100-second absolute verification. No new migration or public privilege is added. The owner must approve the default policy and confirm manual results; this does not close WP02.
