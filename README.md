@@ -108,6 +108,8 @@ The full check verifies PHP extensions, environment files, writable directories,
 
 The WP01 branch contains the environment templates, environment-aware application configuration, pinned Composer manifest and Windows bootstrap procedure. The existing lockfile must be regenerated on the existing XAMPP PHP 8.2.4 development machine using the supplied script, and the local runtime must pass the manual readiness checks before WP01 can be accepted.
 
+**Encryption key:** if the local `.env` still has `encryption.key = ''` after the dependencies are installed, run `C:\xampp\php\php.exe spark key:generate` once. This writes a new key to the local `.env` without displaying it. Do not use `--force` when a key already exists, and never commit `.env`.
+
 ## PHP 8.2.4 decision and upgrade boundary
 
 The local PHP 8.2.4 baseline was explicitly approved on 21 November 2026 after the original 8.4 preflight blocked the user's installed XAMPP environment. Upstream CodeIgniter 4.7.6 and Shield 1.4.1 both declare PHP ^8.2. The Composer project constraint is ^8.2.4. This exception avoids upgrading XAMPP during P1-WP01; it does not approve an unpatched PHP 8.2.4 server for staging or production. Before exposing real member information, move to a supported, security-patched PHP runtime and repeat Composer/platform checks.
