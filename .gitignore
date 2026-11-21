@@ -76,9 +76,9 @@ php_errors.log
 /user_guide_src/cilexer/pycilexer.egg-info/*
 
 #-------------------------
-# Composer
+# Composer (project root only; public frontend vendor assets are tracked)
 #-------------------------
-vendor/
+/vendor/
 
 #-------------------------
 # IDE / Development Files
