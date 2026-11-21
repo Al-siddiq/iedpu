@@ -108,12 +108,14 @@ final class AuthController extends BaseController
             $resolved = $resolver->resolve($identifier);
             if ($resolved === null) {
                 // Run a constant-cost hash verification on the unknown-account path.
-                password_verify($password, '$2y$12$wJkJzM5fHGkq7Sg8O8i97e5ZHXjQ30P3w9Tn9GhKp6gE6vFVFZpMG');
+                password_verify($password, '$2y$12$EXhOo8gFQXW..a4NsOZfZOvPlGsfn6CFkOdokoAo8mRPfltDBQCSi');
                 return $failure($this);
             }
             $policy = new ScopeAuthorizer($db);
             if ($policy->requiresPendingMfa($resolved['user_id'])) {
                 // Privileged login remains blocked until real MFA is approved.
+                // Keep a password-hash cost on this denied path as well.
+                password_verify($password, '$2y$12$EXhOo8gFQXW..a4NsOZfZOvPlGsfn6CFkOdokoAo8mRPfltDBQCSi');
                 return $failure($this);
             }
             // Shield::check verifies its password hash and rehashes as needed,
