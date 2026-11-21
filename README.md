@@ -153,3 +153,7 @@ and accessibility checklist is in
 ## P1-WP04 — Installable portal and offline fallback
 
 All local vendors (Vue 3.5.24, Bootstrap 5.3.9 and Dexie 4.2.1) are committed. Pull the P1 branch and start Spark as above. In Chrome/Edge at http://127.0.0.1:8080/, inspect DevTools > Application > Manifest and Service Workers. After activation and an online reload, set Network to Offline and reload a public route. The offline page must show; restore Online and return home. No personal or administrative information is stored offline. See docs/implementation/P1/WP04_PWA_Deployment_and_Acceptance.md and P1_Hosting_and_Deployment_Runbook.md for full checks. P1 is not accepted or deployed until manual evidence and hosting method are approved.
+
+### Final P1 branding assets (required before starting the updated worker)
+
+After pulling the final branding refinement, run `powershell -ExecutionPolicy Bypass -File scripts/generate-brand-assets.ps1` on Windows. This produces the official IEDPU logo-derived raster icons and favicon from the committed public/assets/IEDPU.png without network access. Commit the eight generated files listed in WP04 documentation. The SVG Bootstrap Icons 1.13.1 sprite is already committed, no separate download required. The updated Service Worker will not install until all eight raster outputs exist.
