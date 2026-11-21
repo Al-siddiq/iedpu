@@ -132,3 +132,13 @@ deployment and end-to-end manual acceptance.
 
 **Do not merge PR #2 into main yet.** The approved P1 plan requires all
 four work packages and project-owner review before merge.
+
+
+## 7. Owner-confirmed smoke check (21 November 2026)
+
+The project owner confirmed that the requested WP02 terminal/browser checks returned
+the expected results, including HTTP 200 for health and bootstrap, HTTP 403
+for disabled registration and HTTP 404 for the unmounted Shield register
+route. This confirms the reported smoke-test outcomes; it does not independently
+verify the remaining security/webroot/production-mode checklist items.
+Those remain final P1 manual acceptance evidence. WP03 was authorised to proceed.
