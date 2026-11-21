@@ -104,3 +104,39 @@ Added rollback-only local diagnostic: php spark iedpu:p2-token-lifecycle-check -
 5. If the diagnostic fails, copy only its non-secret status lines and exception class. Do not send .env, token strings, password hashes or TOTP secrets.
 
 **Acceptance status:** pending owner execution. The next activation step still requires approved delivery/recipient possession, independent privileged recovery, authorised bootstrap and an atomic mutation+audit service. All HTTP write routes remain 403 and PR #3 remains draft.
+
+
+## Owner acceptance — rollback-only token lifecycle, 21 November 2026
+
+The owner ran the synthetic lifecycle command and reported all five OK lines: wrong-purpose/wrong-account denial, one-time redemption/replay denial, resend invalidation, expiry/revocation denial, and rollback with unchanged row count. The command explicitly retained the operational HOLD. The owner then ran the audit verifier: **17 events verified**, no chain error reported. The verifier correctly notes that this is a check of current DB contents, not independent immutability. This accepts the **synthetic token lifecycle** only; real recipient delivery and HTTP workflows remain unaccepted.
+
+## Next increment — audited internal account completion, pending local regression (21 November 2026)
+
+Committed:
+- app/Libraries/Security/AtomicAuditedMutation.php: holds the audit-chain advisory lock through the **outer** database transaction commit/rollback, so AuditTrail's nested append cannot release the last audit lock before the business mutation commits. Requires an outermost transaction on the same MySQL/MariaDB connection. No network delivery inside the transaction. This wrapper is also applied to the already accepted authenticated PasswordChange flow, which therefore **requires regression testing**.
+- app/Libraries/Auth/PasswordRecovery.php: internal completion of an already-issued and recipient-delivered password-reset token for an **ordinary non-privileged** active account. Checks six-character password policy, existing Shield password identity, token purpose/owner/verified active identifier/expiry/single-use, and refuses any active role holder or account with a TOTP factor until independent privileged recovery is approved. On success it updates Shield's existing password hash, consumes/revokes action tokens, revokes all sessions and appends a durable audit event in one audited transaction. No public reset endpoint or transport exists.
+- app/Libraries/Auth/InvitationActivation.php: internal completion for an independently approved, pre-created **inactive** Shield user with a pending identifier, no Shield password identity, no role assignments and no TOTP. Consumes a previously issued invitation token bound to the pending identifier, creates a single Shield-owned password identity (verified phone OR email), activates the identifier/account, revokes other pending tokens and sessions, and audits atomically. Does not create the account, prove a delivery occurred, send invitations, grant any portal role, or establish IEDPU membership.
+- Existing API route configuration is unchanged. Public registration, reset/activation endpoints, invitation issuance, administrator bootstrap, maker-checker decisions and role assignment endpoints remain disabled. No new migrations.
+
+**Security and acceptance boundaries:** These are internal workflow completion services, **not complete end-to-end or live flows**. Issuance still needs an approved permission-scoped account provisioner, an approved delivery adapter with proof of recipient possession, a safe account resolution strategy, generic throttled API responses and explicit UI. The independent privileged lost-device procedure and HOLD-01 identities remain unapproved. Do not enable operational routes or production deployment.
+
+### Required Windows local regression (disposable database only)
+
+1. Update branch: cd C:\xampp\htdocs\iedpu ; git switch feature/p2-database-auth-governance ; git pull --ff-only origin feature/p2-database-auth-governance
+2. Run: php spark iedpu:p2-governance-preflight
+3. Run: php spark iedpu:p2-token-lifecycle-check --confirm-synthetic
+4. Run: php spark iedpu:p2-audit-verify
+5. Verify ordinary sign-in, synthetic privileged TOTP, /account/security Show/Hide, minimum six-character password-change rules, wrong-current-password denial and session invalidation after a successful password change. **Do not paste passwords or recovery codes.**
+6. Confirm POST /api/v1/auth/password/reset and POST /api/v1/auth/activate and POST /api/v1/administration/approvals remain HTTP 403, with no account or role mutations.
+7. No positive activation/recovery test is claimed yet: no approved delivery and no safe authorised account provisioning flow exist. These are pending WP02 acceptance.
+
+If the existing password-change flow fails after this increment, report the HTTP status and non-secret IEDPU_PASSWORD_CHANGE exception class from local logs; do not enable reset/activation as a workaround.
+
+### Next controlled increments (strict order)
+
+1. **Delivery decision and account provisioning:** owner chooses email and/or phone provider(s) and an authorised assisted process. Implement replaceable delivery adapters, synthetic local delivery only for disposable tests, authorised scoped invitation issue and generic recovery request, possession-verified activation/reset routes, rate limits, CSRF, audit and positive/negative acceptance.
+2. **Independent administrator bootstrap:** obtain owner-designated separate Committee and technical identities and authorisation references through approved secure local channels (never chat credentials); build CLI-only one-time atomic bootstrap and independent acceptance. No technical self-elevation.
+3. **Maker-checker service:** lock immutable intent, enforce requester/checker separation, approved scope/permission and ceiling, target-state revalidation, expiry and exactly-once execution/audit. Ordinary branch activation remains direct under approved Committee authority.
+4. **Protected role assignments:** require approved role profiles, same-grant scoped ceiling, checker where required, prohibit self-elevation, revoke sessions on change, audit and cross-scope manual tests.
+
+PR #3 remains DRAFT and unmerged.
