@@ -13,7 +13,7 @@ final class CreateP2AccountIdentifiers extends Migration
 
     public function up(): void
     {
-        if ($this->db->getPlatform() !== 'MySQLi' || $this->db->DBPrefix !== '') {
+        if ($this->db->getPlatform() !== 'MySQLi' || $this->db->getPrefix() !== '') {
             throw new RuntimeException('P2 requires MySQLi with an empty table prefix.');
         }
         $user = $this->db->query("SELECT COLUMN_TYPE AS column_type FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'id'")->getRowArray();
