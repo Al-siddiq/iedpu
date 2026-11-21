@@ -7,6 +7,13 @@ use CodeIgniter\Router\RouteCollection;
 /** @var RouteCollection $routes */
 $routes->get('/', 'Home::index');
 
+// P1-WP03: public, read-only visual previews. These routes confer no access
+// to member, branch, committee or developer operations.
+$routes->get('preview/member', 'Home::index');
+$routes->get('preview/branch', 'Home::index');
+$routes->get('preview/committee', 'Home::index');
+$routes->get('preview/technical', 'Home::index');
+
 // P1-WP02: All API routes are explicitly declared; auto-routing is disabled.
 // Do not mount Shield's default login/register routes until P2 has configured
 // authentication, invitation-only account creation, and role-scoped access.
