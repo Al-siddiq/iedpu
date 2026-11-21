@@ -31,6 +31,10 @@ P2 Strategic Implementation Plan §5 A–E, owner P2-AUTH-01, P0 Engineering Dec
 | ALL | /api/v1/technical/* | None | Disabled; no diagnostics or privileged access | 403 |
 | ALL | /api/v1/registration, members, finance, payments etc. | None | Disabled per P1 gate | 403 |
 
+## CI verification (source-level only)
+
+GitHub Actions workflow `.github/workflows/php-lint.yml` runs `php -l` on all `app/` and `scripts/` PHP files and the standalone login-identifier smoke script. The run for commit `260d937c053b24f2f27eb8c2bfa1b21a36cc40f0` completed successfully (run 44891508251). This **does not** validate Shield runtime, MySQL, CSRF integration, session cookies, synthetic provisioning, privilege enforcement or any local/staging deployment. Those remain operator manual gates.
+
 ## Local manual acceptance — do not claim success before execution
 
 1. Check out the P2 branch and pull latest; run `C:\xampp\php\php.exe -l` on all new/modified PHP files (listed below). Run `spark routes` and confirm no Shield default routes.
