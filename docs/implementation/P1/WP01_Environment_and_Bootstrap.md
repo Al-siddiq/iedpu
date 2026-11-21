@@ -112,3 +112,23 @@ The user's WP01 preflight showed PHP 8.2.4 and all five required PHP extensions 
 This change updates `composer.json`, `public/index.php`, `spark`, the preflight checker, README and the SRS. CodeIgniter 4.7.6 and Shield 1.4.1 upstream manifests both require PHP ^8.2, so this version combination is supported at the declared package-constraint level. Actual installation is still subject to Composer platform resolution. The PHP 8.2.4 patch release is outdated: no public deployment or real member data is approved on this local runtime. Before staging/production, use a currently supported, security-patched PHP runtime and repeat the manual compatibility checks.
 
 **Run after pulling the latest branch:** `powershell -ExecutionPolicy Bypass -File scripts/bootstrap-windows.ps1 -PhpPath C:\xampp\php\php.exe`. Do not commit the stale lockfile. When the script passes, commit only the newly generated `composer.lock` and return the non-sensitive verification output for review.
+
+
+## 11. WP01 lockfile confirmation (21 November 2026)
+
+The project owner pushed commit `ff16b8faf7fbcb91399673488d7c0ecb89d4aecf`
+with message `build(p1-wp01): lock verified CI4 and Shield dependencies`.
+GitHub inspection of the committed `composer.lock` confirms:
+
+- Platform PHP requirement: `^8.2.4`.
+- CodeIgniter framework: `v4.7.6`.
+- CodeIgniter Shield: `v1.4.1`.
+- CodeIgniter Settings: `v2.4.0`.
+- Development-only locked package count: `0`.
+
+The owner reports that local bootstrap and verification completed successfully.
+This establishes **source-control dependency readiness**, but the actual local
+terminal output, database diagnostic and security/webroot observations have
+not been independently inspected in this GitHub record. WP01-M01–M08
+remain human-evidence items for final P1 acceptance. WP02 implementation
+may proceed on the same P1 branch without repeating dependency resolution.
