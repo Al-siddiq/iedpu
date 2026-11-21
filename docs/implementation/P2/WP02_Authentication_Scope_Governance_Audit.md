@@ -91,3 +91,9 @@ The PowerShell script checks health 200, CSRF 200, anonymous session 401, missin
 - **Testing**: automated integration tests and full manual acceptance against actual local/staging infrastructure.
 
 **Do not accept WP02 as complete based on this first increment.** Do not merge PR #3 or deploy real accounts until all WP02 exit gates have passed.
+
+## Session revocation increment — committed, owner acceptance pending (21 November 2026)
+
+The owner has accepted the **first read-only WP03 directory increment**. The implementation sequence has returned to an outstanding WP02 prerequisite: cross-device session invalidation. A new `portal_user_session_versions` table, `SessionVersion` service, Shield-login/MFA session stamping, per-request protected-session validation, and a local-only synthetic-account revocation command are committed.
+
+The [two-browser manual acceptance runbook](P2_WP02_Session_Revocation_Acceptance.md) is the binding test for this increment. This change **does not** provide production administrator revocation, secure invitations, account recovery, independent approvals or protected role grants. Do not interpret a successful lint run as manual acceptance.
