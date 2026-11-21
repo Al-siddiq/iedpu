@@ -17,7 +17,7 @@
     <label for="current">Current password</label>
     <input id="current" type="password" name="current_password" autocomplete="current-password" required maxlength="1024">
     <label for="next">New password</label>
-    <input id="next" type="password" name="new_password" autocomplete="new-password" required minlength="12" maxlength="128">
+    <input id="next" type="password" name="new_password" autocomplete="new-password" required minlength="12" maxlength="72">
     <label for="confirm">Confirm new password</label>
     <input id="confirm" type="password" name="confirm_password" autocomplete="new-password" required minlength="12" maxlength="128">
     <p class="hint">Use 12–128 characters, including letters and numbers. Use a unique password.</p>
