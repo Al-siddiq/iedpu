@@ -161,3 +161,7 @@ After pulling the final branding refinement, run `powershell -ExecutionPolicy By
 ## P2-WP01 — Database foundation
 
 Follow [WP01 migration and manual verification runbook](docs/implementation/P2/WP01_Database_Foundation.md) on an isolated local DB. Official vendor migrations and 22 app tables; seed only the release-controlled permission catalogue. Authentication and all business routes remain disabled until WP02+. No real data or production deployment.
+
+## 2015 Constitution reader and DB-10
+
+The source-derived, read-only [Constitution reader](docs/implementation/P2/DB10_Constitutional_Reference_and_Reader.md) is available at `/constitution/2015` with a section index, schedules, search and mobile-friendly reading pages. This transcription is **pending source proofreading**, is **public preview only** until member authentication is implemented, and is not a legal amendment. The optional, owner-authorised `P2AncestralReferenceSeeder` imports exactly 11 inactive Section 2(a) references; it does not activate branches or membership.
