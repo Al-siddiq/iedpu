@@ -103,6 +103,8 @@ WP01 does not create Shield tables, run Shield migrations, create the first Comm
 
 The GitHub repository has been updated for the owner's existing XAMPP PHP 8.2.4 runtime. This coding execution environment does not have Composer installed, cannot reach Packagist, and cannot inspect the user's local XAMPP. Therefore the dependency lock refresh and machine-specific checks must run through the supplied PowerShell script on the development computer. WP01 remains **in progress** until the generated lockfile and manual evidence are returned and reviewed.
 
+**Local encryption key:** after Composer installs the framework, run `C:\xampp\php\php.exe spark key:generate` once only if `encryption.key` is empty in the local `.env`. Do not overwrite an existing key, share it, or commit `.env`. No Shield migrations or user creation are part of WP01.
+
 ## 10. Approved PHP 8.2.4 local compatibility decision (21 November 2026)
 
 The user's WP01 preflight showed PHP 8.2.4 and all five required PHP extensions passing; only the original 8.4 minimum failed. The user's subsequent `composer install` was correctly rejected because `composer.lock` still specified CI4 4.7.4 and did not contain Shield. These are two different issues. The approved remedy is to lower the **local development** project minimum to PHP 8.2.4 and then run the WP01 Composer **update** process, which will resolve CI4 4.7.6, Shield 1.4.1, Settings ^2.1 and their dependencies.
