@@ -7,6 +7,7 @@ use CodeIgniter\Router\RouteCollection;
 /** @var RouteCollection $routes */
 $routes->get('/', 'Home::index');
 $routes->get('sign-in', 'SignIn::index');
+$routes->get('administration/workspace', 'AdminWorkspace::index');
 
 // P1-WP03: public, read-only visual previews. These routes confer no access
 // to member, branch, committee or developer operations.
