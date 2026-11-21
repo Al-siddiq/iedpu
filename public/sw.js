@@ -1,13 +1,15 @@
 /* P1 public-only offline foundation. Bump VERSION when changing cached assets. */
 'use strict';
-const VERSION = 'p1-wp04-001';
+const VERSION = 'p1-wp04-002';
 const scope = new URL(self.registration.scope);
 const prefix = 'iedpu-public:' + scope.pathname + ':';
 const cacheName = prefix + VERSION;
 const absolute = path => new URL(path, scope).href;
 const files = [
     'offline.html', 'manifest.webmanifest',
-    'assets/icons/portal-192.svg', 'assets/icons/portal-512.svg',
+    'assets/IEDPU.png', 'assets/icons/bootstrap-icons.svg',
+    'favicon.ico', 'assets/icons/favicon-16.png', 'assets/icons/favicon-32.png', 'assets/icons/favicon-48.png',
+    'assets/icons/apple-touch-icon.png', 'assets/icons/portal-192.png', 'assets/icons/portal-512.png', 'assets/icons/portal-maskable-512.png',
     'assets/css/offline.css', 'assets/css/bootstrap.min.css', 'assets/css/app-theme.css',
     'assets/js/vendor/vue.global.prod.js', 'assets/js/vendor/bootstrap.bundle.min.js',
     'assets/js/vendor/dexie.min.js', 'assets/js/core/app.js', 'assets/js/core/navigation.js',
