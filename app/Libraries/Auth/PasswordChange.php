@@ -27,10 +27,11 @@ final class PasswordChange
         if ($userId < 1 || strlen($current) > 1024 || $current === '') {
             return 'incorrect';
         }
-        if (strlen($next) < 12 || strlen($next) > 72
-            || preg_match('/[[:cntrl:]]/', $next)
-            || !preg_match('/[A-Za-z]/', $next)
-            || !preg_match('/[0-9]/', $next)) {
+        if (!mb_check_encoding($next, 'UTF-8')
+            || mb_strlen($next, 'UTF-8') < 6
+            || strlen($next) > 72
+            || trim($next) === ''
+            || preg_match('/[[:cntrl:]]/', $next)) {
             return 'weak';
         }
         if (hash_equals($current, $next)) {
