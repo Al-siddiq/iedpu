@@ -6,7 +6,7 @@ The IEDPU North Zone Digital Portal is a CodeIgniter 4 modular-monolith applicat
 
 | Component | Project baseline |
 |---|---|
-| PHP | 8.5 preferred; 8.4 accepted fallback |
+| PHP | 8.2.4 approved for local XAMPP development; production requires a supported security-patched PHP version |
 | Backend | CodeIgniter 4.7.6 |
 | Authentication foundation | CodeIgniter Shield 1.4.1 |
 | Shield settings dependency | codeigniter4/settings ^2.1, resolved in composer.lock |
@@ -21,7 +21,7 @@ Exact package versions and transitive dependencies must be recorded in composer.
 
 ## Requirements
 
-- PHP 8.4 or later. PHP 8.5 is preferred.
+- PHP 8.2.4 or later for local WP01. The installed XAMPP PHP 8.2.4 has been accepted for development; apply supported PHP security updates before public deployment.
 - PHP extensions: intl, mbstring, mysqli, openssl and fileinfo.
 - curl is recommended for Shield password-breach validation and outbound HTTP features.
 - Composer 2.x.
@@ -31,7 +31,7 @@ Exact package versions and transitive dependencies must be recorded in composer.
 ## Local setup on Windows / XAMPP
 
 1. Clone the repository and check out the active development branch.
-2. Ensure XAMPP PHP 8.4 or later is installed.
+2. Use the existing XAMPP PHP 8.2.4 installation; no XAMPP upgrade is required for this local work package.
 3. Enable intl, mbstring, mysqli, openssl and fileinfo in the PHP configuration used by both CLI and Apache. Restart Apache after changing php.ini.
 4. Install Composer 2.x and configure the Composer installer to use the same XAMPP PHP executable.
 5. Copy .env.development.example to .env.
@@ -45,7 +45,7 @@ Exact package versions and transitive dependencies must be recorded in composer.
 
    powershell -ExecutionPolicy Bypass -File scripts/bootstrap-windows.ps1 -PhpPath C:\xampp\php\php.exe
 
-9. The script resolves the pinned framework and Shield dependencies, refreshes composer.lock, validates platform requirements, checks the installed framework, and confirms that Spark starts.
+9. The script uses Composer update (not composer install) to resolve the pinned framework and Shield dependencies, refreshes composer.lock, validates platform requirements, checks the installed framework, confirms Spark starts and verifies a read-only database connection.
 10. Start the local application:
 
     php spark serve --host 127.0.0.1 --port 8080
@@ -106,4 +106,10 @@ The full check verifies PHP extensions, environment files, writable directories,
 
 ## Current WP01 status
 
-The WP01 branch contains the environment templates, environment-aware application configuration, pinned Composer manifest and Windows bootstrap procedure. The existing lockfile must be regenerated on the actual PHP 8.4+ development machine using the supplied script, and the local XAMPP runtime must pass the manual readiness checks before WP01 can be accepted.
+The WP01 branch contains the environment templates, environment-aware application configuration, pinned Composer manifest and Windows bootstrap procedure. The existing lockfile must be regenerated on the existing XAMPP PHP 8.2.4 development machine using the supplied script, and the local runtime must pass the manual readiness checks before WP01 can be accepted.
+
+## PHP 8.2.4 decision and upgrade boundary
+
+The local PHP 8.2.4 baseline was explicitly approved on 21 November 2026 after the original 8.4 preflight blocked the user's installed XAMPP environment. Upstream CodeIgniter 4.7.6 and Shield 1.4.1 both declare PHP ^8.2. The Composer project constraint is ^8.2.4. This exception avoids upgrading XAMPP during P1-WP01; it does not approve an unpatched PHP 8.2.4 server for staging or production. Before exposing real member information, move to a supported, security-patched PHP runtime and repeat Composer/platform checks.
+
+**After pulling the corrected WP01 branch:** run `powershell -ExecutionPolicy Bypass -File scripts/bootstrap-windows.ps1 -PhpPath C:\xampp\php\php.exe`. Do **not** run `composer install` until Composer has regenerated `composer.lock` using `composer update`. When the script passes, commit only the generated `composer.lock` and share the non-sensitive terminal results for WP01 acceptance. Never commit `.env` or `vendor/`.
