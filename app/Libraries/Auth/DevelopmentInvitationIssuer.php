@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Libraries\Auth;
 
-use App\Libraries\Auth\Delivery\SyntheticLocalDelivery;
+use App\Libraries\Auth\Delivery\AccountActionDelivery;
 use App\Libraries\Security\AtomicAuditedMutation;
 use App\Libraries\Security\AuditTrail;
 use App\Libraries\Security\RequestId;
@@ -23,7 +23,7 @@ final class DevelopmentInvitationIssuer
 {
     public function __construct(
         private readonly BaseConnection $db,
-        private readonly SyntheticLocalDelivery $delivery
+        private readonly AccountActionDelivery $delivery
     ) {
     }
 
@@ -58,6 +58,24 @@ final class DevelopmentInvitationIssuer
             return 'denied';
         }
 
+        return $this->issueAfterSessionGate($issuerId, $targetId, $identifierId, $scope, $zoneId, $branchId);
+    }
+
+    /**
+     * Private transaction/delivery core. Only issue() may call this in the app.
+     * A disposable CLI acceptance harness may invoke it through reflection,
+     * without forging a Shield identity or MFA session. This does NOT prove
+     * successful end-to-end authenticated issuance.
+     * @return 'delivered'|'denied'|'delivery_failed'
+     */
+    private function issueAfterSessionGate(
+        int $issuerId, int $targetId, int $identifierId, string $scope,
+        ?int $zoneId = null, ?int $branchId = null
+    ): string {
+        $this->assertDisposableLocal();
+        if ($issuerId < 1 || $targetId < 1 || $identifierId < 1 || $issuerId === $targetId) {
+            return 'denied';
+        }
         // Do not begin a write transaction if the preliminary gate fails.
         if (!(new InvitationIssuanceEligibility($this->db))->allows(
             $issuerId, $targetId, $identifierId, $scope, $zoneId, $branchId
