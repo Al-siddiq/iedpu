@@ -3,7 +3,7 @@
     "description": "IEDPU North Zone Digital Membership, Administration and Development Portal",
     "type": "project",
     "require": {
-        "php": "^8.4",
+        "php": "^8.2.4",
         "codeigniter4/framework": "4.7.6",
         "codeigniter4/shield": "1.4.1"
     },
