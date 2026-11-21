@@ -1,5 +1,7 @@
 import { PortalAuthClient } from '../core/auth-client.js';
+import { initPasswordVisibility } from '../core/password-visibility.js';
 
+const resetPasswordVisibility = initPasswordVisibility();
 const form = document.getElementById('password-form');
 const status = document.getElementById('status');
 const button = document.getElementById('submit');
@@ -34,6 +36,7 @@ form.addEventListener('submit', async (event) => {
   } finally {
     // Never retain passwords in input fields after any submission.
     form.reset();
+    resetPasswordVisibility();
     button.disabled = false;
   }
 });
