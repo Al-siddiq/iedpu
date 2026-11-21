@@ -252,9 +252,9 @@ class Auth extends ShieldAuth
      * Minimum Password Length
      * --------------------------------------------------------------------
      * The minimum length that a password must be to be accepted.
-     * Recommended minimum value by NIST = 8 characters.
+     * Owner-selected minimum of 6 characters; shorter than modern security recommendations.
      */
-    public int $minimumPasswordLength = 8;
+    public int $minimumPasswordLength = 6;
 
     /**
      * --------------------------------------------------------------------
@@ -267,12 +267,11 @@ class Auth extends ShieldAuth
      *
      * @var list<class-string<ValidatorInterface>>
      */
-    public array $passwordValidators = [
-        CompositionValidator::class,
-        NothingPersonalValidator::class,
-        DictionaryValidator::class,
-        // PwnedValidator::class,
-    ];
+    // Owner-approved minimum-only policy: letters-only, digits-only or mixed
+    // passwords are accepted. Existing MFA, throttling and session security
+    // remain mandatory for privileged access. Do not silently restore
+    // composition/dictionary restrictions in future account provisioning.
+    public array $passwordValidators = [];
 
     /**
      * --------------------------------------------------------------------
