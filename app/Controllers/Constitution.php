@@ -30,7 +30,8 @@ final class Constitution extends BaseController
     {
         helper('url');
         $document = $this->document();
-        $query = trim((string) $this->request->getGet('q'));
+        $rawQuery = $this->request->getGet('q');
+        $query = is_string($rawQuery) ? trim($rawQuery) : '';
         if (mb_strlen($query) > 80) {
             $query = mb_substr($query, 0, 80);
         }
