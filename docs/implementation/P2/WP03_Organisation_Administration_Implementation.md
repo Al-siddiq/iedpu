@@ -33,3 +33,13 @@
 ## WP03 completion gate
 
 Do not mark WP03 complete until protected administration CRUD, independent approval, audited branch activation, official-office independence, role/grant ceiling, scope isolation for all lists/counts/details/exports, technical separation, invitations and account revocation, manual desktop/mobile evidence and owner sign-off have passed. **This first increment is not an alternative to those gates.**
+
+## Owner manual acceptance — 21 November 2026
+
+**Owner-reported outcome: ACCEPTED — first read-only WP03 increment only.**
+
+The project owner confirms that they ran the local manual verification described above, checked the observable results, and found exactly the expected behaviour. The owner explicitly accepted the results.
+
+**Evidence boundary:** This records the owner's direct report; no screenshots, local log exports, or execution transcript were supplied with the acceptance message. In particular, the accepted negative-access behaviour of the synthetic zero-permission fixture is **not** evidence of a working privileged administrator role or a successful scoped positive-access workflow.
+
+**Release status unchanged:** WP03 is IN PROGRESS; WP02 outstanding security prerequisites, the protected mutation endpoints, real account bootstrap, approval workflows, cross-scope positive cases, and WP04 remain unaccepted. PR #3 remains draft and must not be merged or deployed to live users based on this increment.
