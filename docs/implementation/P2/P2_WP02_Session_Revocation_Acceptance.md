@@ -1,6 +1,6 @@
 # P2-WP02 — Account-wide session revocation increment
 
-**Implementation:** 21 November 2026. **Status: committed, owner manual acceptance pending.** This increment follows owner acceptance of the first WP03 read-only directory foundation. It does **not** close the WP02 or WP03 completion gates.
+**Implementation:** 21 November 2026. **Status: OWNER-ACCEPTED (21 November 2026), based on the owner's direct confirmation of revocation.** This increment follows owner acceptance of the first WP03 read-only directory foundation. It does **not** close the WP02 or WP03 completion gates.
 
 ## Security intent
 
@@ -72,3 +72,7 @@ The version table is separate from Shield's authentication identities; it stores
 | SREV-09 | Existing WP03 401/403 permission boundaries and public P1 pages preserved |
 
 **Please report which checks passed or failed.** Do not claim WP02 complete or merge PR #3 until the other security prerequisites have been delivered and accepted.
+
+## Owner acceptance record — 21 November 2026
+
+The owner explicitly confirmed: **"i comfirm the revocation, continue to the next implementation increment."** This accepts the cross-device session revocation increment based on the owner's local observation. Individual SREV checklist items and test evidence were not supplied separately, so no independent per-case results are claimed. This acceptance does not close WP02 or WP03 and does not authorise real-account administrative revocation.
