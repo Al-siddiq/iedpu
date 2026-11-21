@@ -1,6 +1,6 @@
 # P2-WP01 — Relational Database and Persistence Foundation
 
-Status: source committed; local and staging database execution/acceptance pending.
+Status: owner confirmed local review, testing and acceptance of P2-WP01 on 21 November 2026; staging/production remain separately gated. DB-10 constitutional import added subsequently; its execution and reader proofreading are pending.
 Authority: Database Schema Design §§2, 4–6, 7.1, 8.1, 8.4, 9, 24–26; strategic P2 activities 1–6, 9–12; owner decision P2-AUTH-01.
 No routes, auth configuration, dependency lock, P1 UI or service worker changed.
 
@@ -20,7 +20,7 @@ Active identifiers require verified_at and no revoked_at. At least one active ve
 member_user_links generated active_member_id/active_user_id unique guards permit history but at most one active link per member/user; services must still lock and validate.
 
 ## Seed policy
-P2PermissionCatalogueSeeder inserts 27 release-defined P2 keys, repeats without duplication, fails on metadata drift rather than changing grants. Grant domain labels are engineering metadata, not implemented authorisation. No role records, assignments, users, branches, zones, office records or real member records seeded. Future action keys added through reviewed releases. P2AncestralReferenceSeeder is an optional reviewed import of 11 constitution-derived labels, inactive pending confirmation; verify town/district classifications before import and never infer member eligibility. No mandatory geographic coverage imports.
+P2PermissionCatalogueSeeder inserts 27 release-defined P2 keys, repeats without duplication, fails on metadata drift rather than changing grants. Grant domain labels are engineering metadata, not implemented authorisation. No role records, assignments, users, branches, zones, office records or real member records seeded. Future action keys added through reviewed releases. P2AncestralReferenceSeeder is an owner-authorised, optional Section 2(a) import of 11 constitution-derived labels, inactive pending confirmation. See [DB-10 constitutional reference and reader runbook](DB10_Constitutional_Reference_and_Reader.md). Never infer member eligibility. No mandatory geographic coverage imports.
 
 ## Local procedure (Windows XAMPP CMD)
 Stop Spark; start MySQL in XAMPP. Confirm .env points only to your disposable/local development DB, not staging/production. Back up first, or use a new empty test DB. Never commit .env, SQL dumps or keys.
