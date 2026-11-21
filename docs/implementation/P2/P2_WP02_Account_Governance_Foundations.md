@@ -140,3 +140,15 @@ If the existing password-change flow fails after this increment, report the HTTP
 4. **Protected role assignments:** require approved role profiles, same-grant scoped ceiling, checker where required, prohibit self-elevation, revoke sessions on change, audit and cross-scope manual tests.
 
 PR #3 remains DRAFT and unmerged.
+
+
+### Atomic audit acceptance addition
+
+After pulling the latest branch, run on the same **disposable local DB only**:
+
+~~~bat
+php spark iedpu:p2-atomic-audit-check --confirm-synthetic
+php spark iedpu:p2-audit-verify
+~~~
+
+The first command intentionally writes and rolls back a nested synthetic audit event, then commits exactly one **non-secret** synthetic audit event. Expected: three OK lines; the second command must verify the updated chain. Unlike the rollback-only token check, this command **permanently adds one synthetic audit event** to the disposable database. If either fails, STOP and report only non-secret status/exception class; do not proceed with any activation or role grants. This check proves the local audit wrapper's nested commit/rollback integration; it does not establish real invitation delivery, recovery, governance approval or production readiness.
