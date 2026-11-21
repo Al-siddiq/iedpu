@@ -85,6 +85,7 @@ final class AuthController extends BaseController
         }
 
         // Both network and identifier buckets; never persist raw identifiers in keys.
+        $stage = 'rate_limit';
         try {
             $throttler = service('throttler');
             $ipKey = hash('sha256', $this->request->getIPAddress());
@@ -92,7 +93,8 @@ final class AuthController extends BaseController
                 || !$throttler->check('iedpu-auth-id-' . hash('sha256', $rateKey), 6, 300)) {
                 return ApiResponder::error($this->request, $this->response, 429, 'rate_limited', 'Too many attempts. Try again later.');
             }
-        } catch (Throwable) {
+        } catch (Throwable $exception) {
+            $this->logAuthFailure($stage, $exception);
             return ApiResponder::error($this->request, $this->response, 503, 'auth_unavailable', 'Authentication is temporarily unavailable.');
         }
 
@@ -105,6 +107,7 @@ final class AuthController extends BaseController
             return ApiResponder::error($controller->request, $controller->response,
                 401, 'invalid_credentials', 'The supplied credentials could not be verified.');
         };
+        $stage = 'identifier_resolution';
         try {
             $db = db_connect();
             $resolver = new VerifiedIdentifierResolver($db);
@@ -118,6 +121,7 @@ final class AuthController extends BaseController
             // This avoids revealing whether an identifier belongs to an officer.
             // Shield::check does not log the submitted raw identifier.
 
+            $stage = 'shield_password_check';
             $result = $auth->check(['email' => $resolved['shield_secret'], 'password' => $password]);
             if (!$result->isOK()) {
                 return $failure($this);
@@ -127,12 +131,15 @@ final class AuthController extends BaseController
                 || !$user->active || $user->isBanned()) {
                 return $failure($this);
             }
+            $stage = 'privileged_role_lookup';
             $policy = new ScopeAuthorizer($db);
             $hasFactor = $db->table('portal_totp_factors')->where('user_id', (int) $user->id)->countAllResults() > 0;
             if ($policy->requiresPendingMfa((int) $user->id) || $hasFactor) {
                 // Password verification is NOT an authenticated Shield session.
                 // Bind a short-lived challenge to this server-side session only.
+                $stage = 'mfa_key_configuration';
                 new \App\Libraries\Auth\TotpFactor($db); // fail closed if MFA key is missing
+                $stage = 'mfa_pending_session';
                 session()->regenerate(true);
                 session()->remove('iedpu_mfa_verified_user');
                 session()->set('iedpu_mfa_pending', [
@@ -148,9 +155,11 @@ final class AuthController extends BaseController
                 ], 202);
             }
             // Shield's supported session login method rotates the session ID.
+            $stage = 'shield_session_creation';
             $auth->login($user);
 
             // Audit must be durable before an authenticated session is returned.
+            $stage = 'login_audit';
             (new AuditTrail($db))->append([
                 'action_key' => 'auth.login',
                 'module_code' => 'security',
@@ -164,10 +173,30 @@ final class AuthController extends BaseController
                 'privileged_access' => false,
                 'mfa_available' => false,
             ]);
-        } catch (Throwable) {
-            $auth->logout();
+        } catch (Throwable $exception) {
+            $this->logAuthFailure($stage, $exception);
+            try {
+                $auth->logout();
+            } catch (Throwable) {
+                // Never let cleanup hide the original error or reveal details.
+            }
+            session()->remove('iedpu_mfa_pending');
+            session()->remove('iedpu_mfa_verified_user');
             return ApiResponder::error($this->request, $this->response, 503, 'auth_unavailable', 'Authentication is temporarily unavailable.');
         }
+    }
+
+    /**
+     * Local diagnostics without credentials, identifiers, raw SQL or exception
+     * messages. The request ID links a failed attempt to its server-side stage.
+     */
+    private function logAuthFailure(string $stage, Throwable $exception): void
+    {
+        log_message('error', 'IEDPU_AUTH_DIAG stage={stage} exception={exception} request_id={request_id}', [
+            'stage' => $stage,
+            'exception' => get_class($exception),
+            'request_id' => RequestId::current(),
+        ]);
     }
 
     public function logout(): ResponseInterface
