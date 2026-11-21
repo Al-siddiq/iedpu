@@ -1,22 +1,11 @@
 {
-    "name": "codeigniter4/appstarter",
-    "description": "CodeIgniter4 starter app",
-    "license": "MIT",
+    "name": "iedpu/north-zone-portal",
+    "description": "IEDPU North Zone Digital Membership, Administration and Development Portal",
     "type": "project",
-    "homepage": "https://codeigniter.com",
-    "support": {
-        "forum": "https://forum.codeigniter.com/",
-        "source": "https://github.com/codeigniter4/CodeIgniter4",
-        "slack": "https://codeigniterchat.slack.com"
-    },
     "require": {
-        "php": "^8.2",
-        "codeigniter4/framework": "^4.7"
-    },
-    "require-dev": {
-        "fakerphp/faker": "^1.9",
-        "mikey179/vfsstream": "^1.6",
-        "phpunit/phpunit": "^10.5.16"
+        "php": "^8.2.4",
+        "codeigniter4/framework": "4.7.6",
+        "codeigniter4/shield": "1.4.1"
     },
     "autoload": {
         "psr-4": {
@@ -27,17 +16,12 @@
             "**/Database/Migrations/**"
         ]
     },
-    "autoload-dev": {
-        "psr-4": {
-            "Tests\\Support\\": "tests/_support"
-        }
-    },
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true
     },
     "scripts": {
-        "test": "phpunit"
+        "check:environment": "php scripts/check-environment.php"
     }
 }

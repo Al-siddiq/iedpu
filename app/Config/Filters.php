@@ -77,8 +77,7 @@ class Filters extends BaseFilters
             // 'invalidchars',
         ],
         'after' => [
-            // 'honeypot',
-            // 'secureheaders',
+            'secureheaders', // Apply safe HTTP headers to public and API responses.
         ],
     ];
 

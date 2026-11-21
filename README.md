@@ -1,70 +1,159 @@
-# CodeIgniter 4 Application Starter
+# IEDPU North Zone Digital Portal
 
-## What is CodeIgniter?
+The IEDPU North Zone Digital Portal is a CodeIgniter 4 modular-monolith application with a same-origin JSON API and a Vue 3 progressive web application.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+## Approved technical baseline
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+| Component | Project baseline |
+|---|---|
+| PHP | 8.2.4 approved for local XAMPP development; production requires a supported security-patched PHP version |
+| Backend | CodeIgniter 4.7.6 |
+| Authentication foundation | CodeIgniter Shield 1.4.1 |
+| Shield settings dependency | codeigniter4/settings ^2.1, resolved in composer.lock |
+| Database | MySQL-compatible / MariaDB through MySQLi; InnoDB and utf8mb4 |
+| Frontend | Vue 3 global production build; no Node build chain |
+| UI | Bootstrap 5.3.9 |
+| Offline storage | Dexie.js / IndexedDB, only for approved low-risk data in later phases |
+| Runtime | Apache with document root pointing to public/ |
+| Verification | Manual verification only |
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+Exact package versions and transitive dependencies must be recorded in composer.lock. Do not commit vendor/ or local environment secrets.
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+## Requirements
 
-## Installation & updates
+- PHP 8.2.4 or later for local WP01. The installed XAMPP PHP 8.2.4 has been accepted for development; apply supported PHP security updates before public deployment.
+- PHP extensions: intl, mbstring, mysqli, openssl and fileinfo.
+- curl is recommended for Shield password-breach validation and outbound HTTP features.
+- Composer 2.x.
+- MySQL 8.x/8.4 preferred, or a compatible XAMPP MariaDB version confirmed during WP01.
+- Apache rewrite support for Apache deployments.
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+## Local setup on Windows / XAMPP
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+1. Clone the repository and check out the active development branch.
+2. Use the existing XAMPP PHP 8.2.4 installation; no XAMPP upgrade is required for this local work package.
+3. Enable intl, mbstring, mysqli, openssl and fileinfo in the PHP configuration used by both CLI and Apache. Restart Apache after changing php.ini.
+4. Install Composer 2.x and configure the Composer installer to use the same XAMPP PHP executable.
+5. Copy .env.development.example to .env.
+6. Create an empty database named iedpu_dev with character set utf8mb4 and collation utf8mb4_unicode_ci. Do not import real member data.
+7. Review the local .env database host, database name, username and password.
+8. Run the WP01 bootstrap script:
 
-## Setup
+   powershell -ExecutionPolicy Bypass -File scripts/bootstrap-windows.ps1
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+   If PHP is not on PATH, provide the XAMPP executable:
 
-## Important Change with index.php
+   powershell -ExecutionPolicy Bypass -File scripts/bootstrap-windows.ps1 -PhpPath C:\xampp\php\php.exe
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+9. The script uses Composer update (not composer install) to resolve the pinned framework and Shield dependencies, refreshes composer.lock, validates platform requirements, checks the installed framework, confirms Spark starts and verifies a read-only database connection.
+10. Start the local application:
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+    php spark serve --host 127.0.0.1 --port 8080
 
-**Please** read the user guide for a better explanation of how CI4 works!
+11. Open http://127.0.0.1:8080/.
 
-## Repository Management
+The bootstrap script intentionally does not run automated tests. It performs environment and framework installation checks only.
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+## Environment profiles
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+Three reviewed templates are provided:
 
-## Server Requirements
+- .env.development.example — local development.
+- .env.staging.example — staging profile; uses CI_ENVIRONMENT=production so debug output is disabled.
+- .env.production.example — production profile.
 
-PHP version 8.2 or higher is required, with the following extensions installed:
+Copy only the applicable template to .env on each machine. Replace every CHANGE_ME placeholder. Do not reuse database credentials or encryption keys across environments.
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+Generate an encryption key locally:
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - The end of life date for PHP 8.1 was December 31, 2025.
-> - If you are still using below PHP 8.2, you should upgrade immediately.
-> - The end of life date for PHP 8.2 will be December 31, 2026.
+    php -r "echo 'hex2bin:' . bin2hex(random_bytes(32)), PHP_EOL;"
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+Place the generated hex2bin-prefixed value in the local .env as encryption.key. Never commit or share it.
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
-"# iedpu" 
+## Database configuration
+
+The application reads its default MySQLi connection from the machine-specific .env file. The committed config contains no database password. The default local database name is iedpu_dev.
+
+Use a dedicated least-privilege database user for staging and production. Do not use the MySQL root account outside a disposable local XAMPP environment.
+
+## Web server and security boundary
+
+The Apache document root MUST point to the repository's public/ directory only. Never expose the repository root. The app/, vendor/, writable/, docs/, .env, composer.json and composer.lock must not be directly web-accessible.
+
+Staging and production require HTTPS, secure cookies, separate database credentials, private writable storage and debug output disabled. Production deployment is not part of WP01.
+
+## Environment diagnostics
+
+Before Composer installation:
+
+    php scripts/check-environment.php --preflight
+
+After dependencies are installed:
+
+    php scripts/check-environment.php
+
+The full check verifies PHP extensions, environment files, writable directories, exact locked package versions and required vendor packages. It does not execute an application test suite.
+
+## Development policy
+
+- Follow the four foundation documents and the approved P1 work-package plan.
+- Do not hardcode zones, branches, office holders, Chairmen or portal role profiles.
+- Keep executable permission keys release-controlled.
+- Do not add live member data or enable registration during P1.
+- Do not introduce PHPUnit, automated browser tests, automated API tests or CI test suites. Use documented manual verification.
+- Keep secrets and vendor/ out of Git.
+- Use reviewed feature branches and pull requests for phase delivery.
+
+## Current WP01 status
+
+The WP01 branch contains the environment templates, environment-aware application configuration, pinned Composer manifest and Windows bootstrap procedure. The existing lockfile must be regenerated on the existing XAMPP PHP 8.2.4 development machine using the supplied script, and the local runtime must pass the manual readiness checks before WP01 can be accepted.
+
+**Encryption key:** if the local `.env` still has `encryption.key = ''` after the dependencies are installed, run `C:\xampp\php\php.exe spark key:generate` once. This writes a new key to the local `.env` without displaying it. Do not use `--force` when a key already exists, and never commit `.env`.
+
+## PHP 8.2.4 decision and upgrade boundary
+
+The local PHP 8.2.4 baseline was explicitly approved on 21 November 2026 after the original 8.4 preflight blocked the user's installed XAMPP environment. Upstream CodeIgniter 4.7.6 and Shield 1.4.1 both declare PHP ^8.2. The Composer project constraint is ^8.2.4. This exception avoids upgrading XAMPP during P1-WP01; it does not approve an unpatched PHP 8.2.4 server for staging or production. Before exposing real member information, move to a supported, security-patched PHP runtime and repeat Composer/platform checks.
+
+**After pulling the corrected WP01 branch:** run `powershell -ExecutionPolicy Bypass -File scripts/bootstrap-windows.ps1 -PhpPath C:\xampp\php\php.exe`. Do **not** run `composer install` until Composer has regenerated `composer.lock` using `composer update`. When the script passes, commit only the generated `composer.lock` and share the non-sensitive terminal results for WP01 acceptance. Never commit `.env` or `vendor/`.
+
+
+## P1-WP03 — Mobile-first portal preview
+
+The P1 branch now includes a responsive public landing page and four read-only
+workspace previews for members, branch officers, Committee administrators and
+the separate developer/technical team. The real login, registration, branch
+administration, finance and official ID functions remain disabled until their
+approved later phases.
+
+The Bootstrap 5.3.9 CSS and JS production files are committed locally. Install
+the pinned Vue 3.5.24 production global build on your connected Windows PC:
+
+```bat
+cd C:\xampp\htdocs\iedpu
+git pull --ff-only origin feature/p1-wp01-environment-bootstrap
+powershell -ExecutionPolicy Bypass -File scripts/install-frontend-vendors.ps1
+C:\xampp\php\php.exe spark serve --host 127.0.0.1 --port 8080
+```
+
+Open `http://127.0.0.1:8080/` and use the portal navigation to inspect all
+five areas. After checking the generated local vendor asset, commit it:
+
+```bat
+git add public/assets/js/vendor/vue.global.prod.js
+git commit -m "build(p1-wp03): lock local Vue 3.5.24 production asset"
+git push origin feature/p1-wp01-environment-bootstrap
+```
+
+Runtime scripts and styles are served from `public/assets/` — there is no
+production CDN dependency or JavaScript build tool. The complete manual review
+and accessibility checklist is in
+`docs/implementation/P1/WP03_Mobile_First_Frontend_Shells.md`.
+
+
+## P1-WP04 — Installable portal and offline fallback
+
+All local vendors (Vue 3.5.24, Bootstrap 5.3.9 and Dexie 4.2.1) are committed. Pull the P1 branch and start Spark as above. In Chrome/Edge at http://127.0.0.1:8080/, inspect DevTools > Application > Manifest and Service Workers. After activation and an online reload, set Network to Offline and reload a public route. The offline page must show; restore Online and return home. No personal or administrative information is stored offline. See docs/implementation/P1/WP04_PWA_Deployment_and_Acceptance.md and P1_Hosting_and_Deployment_Runbook.md for full checks. P1 is not accepted or deployed until manual evidence and hosting method are approved.
+
+### Final P1 branding assets (required before starting the updated worker)
+
+After pulling the final branding refinement, run `powershell -ExecutionPolicy Bypass -File scripts/generate-brand-assets.ps1` on Windows. This produces the official IEDPU logo-derived raster icons and favicon from the committed public/assets/IEDPU.png without network access. Commit the eight generated files listed in WP04 documentation. The SVG Bootstrap Icons 1.13.1 sprite is already committed, no separate download required. The updated Service Worker will not install until all eight raster outputs exist.

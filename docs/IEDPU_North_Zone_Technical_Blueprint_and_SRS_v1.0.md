@@ -121,7 +121,7 @@ The implementation MUST use the following stack unless a documented technical in
 
 | Layer | Technology | Implementation decision |
 |---|---|---|
-| Backend language | PHP | PHP 8.5 preferred where supported by the selected host; PHP 8.4 is an acceptable fallback |
+| Backend language | PHP | PHP 8.2.4 accepted as the existing local XAMPP development baseline for P1-WP01; use a currently supported, security-patched PHP runtime before any public deployment |
 | Backend framework | CodeIgniter 4 | Latest stable CodeIgniter 4 release at implementation; v4.7.6 is the current release identified on 19 November 2026 |
 | Authentication foundation | CodeIgniter Shield | Use Shield for authentication, sessions and baseline authorization integration |
 | Architecture | Modular Monolith | One deployable application with clearly separated business modules |
@@ -158,7 +158,7 @@ At the start of implementation, the developer MUST:
 6. Keep production JavaScript and CSS dependencies locally hosted.
 7. Test upgrades before applying them to production.
 
-CodeIgniter 4.7.6 was identified as the current release on the preparation date. Its documentation requires PHP 8.2 or newer and identifies PHP 8.5 compatibility from CodeIgniter 4.7.0 onward. The preferred production target is therefore PHP 8.5 where the shared host supports it and all dependencies pass testing; PHP 8.4 is the fallback. Do not deploy on an end-of-life PHP branch.
+CodeIgniter 4.7.6 and CodeIgniter Shield 1.4.1 both declare PHP ^8.2 compatibility. On 21 November 2026, the project owner approved the existing XAMPP PHP 8.2.4 runtime as the local P1-WP01 development baseline to avoid a disruptive XAMPP upgrade. The project Composer constraint is ^8.2.4, with exact framework and Shield versions locked after Composer resolution. PHP 8.2.4 is an old patch release: do not treat acceptance of this local environment as approval to expose it publicly. Before staging or production with real data, choose an actively supported, security-patched PHP runtime and verify all extensions, dependencies and hosting compatibility. Never deploy on an end-of-life PHP branch.
 
 ## 2.2 Architecture style: Modular Monolith
 
@@ -1566,7 +1566,7 @@ The selected provider MUST be assessed before purchase or deployment.
 
 Minimum requirements include:
 
-- PHP 8.5 preferred, PHP 8.4 fallback.
+- PHP 8.2.4 approved for local P1-WP01 development; staging/production must use a supported, security-patched PHP runtime and pass platform checks.
 - Required PHP extensions.
 - MySQL-compatible database with InnoDB.
 - HTTPS and SSL/TLS support.
@@ -1858,7 +1858,7 @@ The following matters must be resolved during technical preparation. They do not
 
 | Item | Required resolution |
 |---|---|
-| Shared-hosting provider | Confirm PHP 8.5 or 8.4, MySQL compatibility, cron, SSL and document-root control |
+| Shared-hosting provider | Confirm a currently supported and security-patched PHP runtime (local WP01 baseline is PHP 8.2.4 only), MySQL compatibility, cron, SSL and document-root control |
 | Database engine | Confirm exact production MySQL/MariaDB version and align local XAMPP testing |
 | Payment provider | Select approved provider and confirm webhook, settlement and refund capabilities |
 | Email/SMS provider | Select approved service and communication policy |

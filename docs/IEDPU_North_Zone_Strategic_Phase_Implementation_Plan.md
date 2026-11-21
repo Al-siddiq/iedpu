@@ -186,6 +186,7 @@ flowchart TD
 **Work packages**
 
 1. Prepare isolated **local XAMPP**, **staging** and **production** configuration profiles. Record PHP and MySQL/MariaDB version compatibility, required extensions, database privileges and composer lockfile.
+   **P1-WP01 approved runtime clarification (21 November 2026):** Existing local XAMPP PHP 8.2.4 is accepted for development. CodeIgniter 4.7.6 and Shield 1.4.1 both declare PHP ^8.2; the project minimum is ^8.2.4. Regenerate the lockfile using Composer update on the actual development machine. This exception does not authorise an outdated PHP 8.2.4 patch for public staging/production; deployment must use a currently supported, security-patched PHP runtime and pass platform checks.
 2. Install latest approved stable CodeIgniter 4 and exact locked Shield version; identify actual `users.id` schema type before custom FKs.
 3. Implement modular-monolith structure, same-origin `/api/v1/` JSON API conventions and centralised server validation/error responses.
 4. Set up **Vue 3 global production build** with Composition API, ordinary JS files and locally hosted vendors; **no Vite/Webpack/Node build, TypeScript, Pinia, Vue Router or `.vue` SFC requirement**.

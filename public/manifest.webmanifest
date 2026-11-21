@@ -1,0 +1,32 @@
+{
+  "id": "./",
+  "name": "IEDPU Northern Zone Digital Portal",
+  "short_name": "IEDPU Portal",
+  "description": "Public information and portal interface previews",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F8F6F2",
+  "theme_color": "#17324D",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "assets/icons/portal-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/portal-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/portal-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
