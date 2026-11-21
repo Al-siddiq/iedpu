@@ -18,7 +18,7 @@ try {
     if ($logo.Width -lt 1 -or $logo.Height -lt 1) { throw 'Invalid logo dimensions.' }
     Write-Host "Official source: $($logo.Width)x$($logo.Height)"
     function Save-Logo([string]$Name, [int]$Size, [double]$Fraction) {
-        $bitmap = New-Object System.Drawing.Bitmap($Size, $Size, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+        $bitmap = [System.Drawing.Bitmap]::new($Size, $Size, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
         $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
         try {
             $graphics.Clear([System.Drawing.Color]::White)
@@ -29,7 +29,7 @@ try {
             $scale = [Math]::Min(($Size * $Fraction) / $logo.Width, ($Size * $Fraction) / $logo.Height)
             $w = [single]($logo.Width * $scale)
             $h = [single]($logo.Height * $scale)
-            $rect = New-Object System.Drawing.RectangleF(([single](($Size-$w)/2)), ([single](($Size-$h)/2)), $w, $h)
+            $rect = [System.Drawing.RectangleF]::new([single](($Size-$w)/2), [single](($Size-$h)/2), $w, $h)
             $graphics.DrawImage($logo, $rect)
             $target = Join-Path $out $Name
             $bitmap.Save($target, [System.Drawing.Imaging.ImageFormat]::Png)
@@ -48,8 +48,8 @@ try {
     $sizes = @(16,32,48)
     $payloads = @()
     foreach ($size in $sizes) { $payloads += ,([System.IO.File]::ReadAllBytes((Join-Path $out "favicon-$size.png"))) }
-    $stream = New-Object System.IO.MemoryStream
-    $writer = New-Object System.IO.BinaryWriter($stream)
+    $stream = [System.IO.MemoryStream]::new()
+    $writer = [System.IO.BinaryWriter]::new($stream)
     try {
         $writer.Write([uint16]0); $writer.Write([uint16]1); $writer.Write([uint16]$sizes.Length)
         $offset = 6 + 16 * $sizes.Length
