@@ -22,7 +22,7 @@
         <label for="identifier">Email address or phone number</label>
         <input id="identifier" name="identifier" autocomplete="username" inputmode="text" required maxlength="190" placeholder="0803 123 4567 or you@example.com">
         <label for="password">Password</label>
-        <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="1024">
+        <div class="password-field"><input id="password" name="password" type="password" autocomplete="current-password" data-password-label="password" required maxlength="1024"><button type="button" class="password-toggle" data-password-toggle aria-controls="password" aria-label="Show password" aria-pressed="false">Show</button></div>
         <button id="login-submit" type="submit">Sign in</button>
     </form>
     <section id="mfa-section" hidden>
