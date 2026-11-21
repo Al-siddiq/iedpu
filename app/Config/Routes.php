@@ -6,6 +6,7 @@ use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 $routes->get('/', 'Home::index');
+$routes->get('sign-in', 'SignIn::index');
 
 // P1-WP03: public, read-only visual previews. These routes confer no access
 // to member, branch, committee or developer operations.
@@ -32,6 +33,8 @@ $routes->group('api/v1', ['namespace' => 'App\\Controllers\\Api\\V1'], static fu
     $routes->get('auth/session', 'AuthController::session');
     $routes->post('auth/login', 'AuthController::login');
     $routes->post('auth/logout', 'AuthController::logout');
+    $routes->get('auth/mfa/setup', 'MfaController::setup');
+    $routes->post('auth/mfa/verify', 'MfaController::verify');
     $routes->add('auth', 'UnavailableController::disabled');
     $routes->add('auth/(:any)', 'UnavailableController::disabled');
 
