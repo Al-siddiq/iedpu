@@ -56,6 +56,19 @@ export class PortalAuthClient {
     return result;
   }
 
+  mfaSetup() {
+    return this.request('api/v1/auth/mfa/setup');
+  }
+
+  async mfaVerify(code) {
+    if (!this.csrf) await this.refreshCsrf();
+    const result = await this.request('api/v1/auth/mfa/verify', {
+      method: 'POST', body: { code }, csrf: true,
+    });
+    this.csrf = null;
+    return result;
+  }
+
   async logout() {
     if (!this.csrf) await this.refreshCsrf();
     const result = await this.request('api/v1/auth/logout', {
