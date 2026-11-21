@@ -149,3 +149,7 @@ production CDN dependency or JavaScript build tool. The complete manual review
 and accessibility checklist is in
 `docs/implementation/P1/WP03_Mobile_First_Frontend_Shells.md`.
 
+
+## P1-WP04 — Installable portal and offline fallback
+
+All local vendors (Vue 3.5.24, Bootstrap 5.3.9 and Dexie 4.2.1) are committed. Pull the P1 branch and start Spark as above. In Chrome/Edge at http://127.0.0.1:8080/, inspect DevTools > Application > Manifest and Service Workers. After activation and an online reload, set Network to Offline and reload a public route. The offline page must show; restore Online and return home. No personal or administrative information is stored offline. See docs/implementation/P1/WP04_PWA_Deployment_and_Acceptance.md and P1_Hosting_and_Deployment_Runbook.md for full checks. P1 is not accepted or deployed until manual evidence and hosting method are approved.
