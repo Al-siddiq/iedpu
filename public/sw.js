@@ -23,7 +23,7 @@ self.addEventListener('install', event => {
         try {
             for (const url of allowed) {
                 const response = await fetch(url, {cache:'reload', credentials:'omit', redirect:'error'});
-                if (!response.ok || response.type !== 'basic' || response.headers.get('content-type')?.includes('text/html') && url !== absolute('offline.html')) {
+                if (!response.ok || response.type !== 'basic' || (response.headers.get('content-type')?.includes('text/html') && url !== absolute('offline.html'))) {
                     throw new Error('Public asset unavailable: ' + url);
                 }
                 await cache.put(url, response);
@@ -66,6 +66,7 @@ self.addEventListener('fetch', event => {
     // Only exact, public static files may be served from our installed cache.
     event.respondWith((async () => {
         const cache = await caches.open(cacheName);
-        return (await cache.match(url.href)) || fetch(request);
+        // Prefer current network assets; the immutable install cache is only a fallback.
+        try { return await fetch(request); } catch { return (await cache.match(url.href)) || Response.error(); }
     })());
 });
