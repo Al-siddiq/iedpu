@@ -13,7 +13,7 @@ Establish reproducible local, staging and production application environments; a
 
 | Package/runtime | Required baseline | Notes |
 |---|---|---|
-| PHP | 8.5 preferred; 8.4 acceptable fallback | Composer constraint is ^8.4 |
+| PHP | 8.2.4 approved for existing local XAMPP | Composer constraint is ^8.2.4; production requires a supported security-patched PHP runtime |
 | CodeIgniter 4 | 4.7.6 | Exact project baseline |
 | CodeIgniter Shield | 1.4.1 | Exact authentication foundation |
 | CodeIgniter Settings | ^2.1 | Shield transitive dependency; exact resolved version belongs in lockfile |
@@ -37,7 +37,7 @@ The application config reads the base URL, timezone, HTTPS setting and database 
 
 ## 4. Local XAMPP setup
 
-1. Install XAMPP with PHP 8.4 or later; PHP 8.5 is preferred.
+1. Keep the existing XAMPP PHP 8.2.4 installation for WP01 local development. No XAMPP/PHP upgrade is required for this local bootstrap.
 2. Enable intl, mbstring, mysqli, openssl and fileinfo in the active PHP CLI and Apache PHP configuration. Enable curl where available.
 3. Install Composer 2.x and point its Windows installer to the same XAMPP PHP executable used by the project.
 4. Open PowerShell at the repository root.
@@ -63,7 +63,7 @@ The repository's existing composer.lock predates these requirements. Do not run 
 
 - PHP preflight;
 - Composer manifest validation;
-- composer update --with-all-dependencies --no-interaction --no-scripts;
+- composer update --with-all-dependencies --no-interaction --no-scripts (do not run composer install against the stale lockfile);
 - manifest/lock validation;
 - composer check-platform-reqs;
 - full environment check;
@@ -101,4 +101,12 @@ WP01 does not create Shield tables, run Shield migrations, create the first Comm
 
 ## 9. Current execution constraint
 
-The GitHub repository can be updated, but this coding execution environment does not have Composer installed, cannot reach Packagist, and does not have the user's XAMPP installation. Therefore the dependency lock refresh and machine-specific XAMPP checks must be run through the supplied PowerShell script on the actual development computer. WP01 must remain **in progress** until the generated lockfile and manual evidence are returned and reviewed.
+The GitHub repository has been updated for the owner's existing XAMPP PHP 8.2.4 runtime. This coding execution environment does not have Composer installed, cannot reach Packagist, and cannot inspect the user's local XAMPP. Therefore the dependency lock refresh and machine-specific checks must run through the supplied PowerShell script on the development computer. WP01 remains **in progress** until the generated lockfile and manual evidence are returned and reviewed.
+
+## 10. Approved PHP 8.2.4 local compatibility decision (21 November 2026)
+
+The user's WP01 preflight showed PHP 8.2.4 and all five required PHP extensions passing; only the original 8.4 minimum failed. The user's subsequent `composer install` was correctly rejected because `composer.lock` still specified CI4 4.7.4 and did not contain Shield. These are two different issues. The approved remedy is to lower the **local development** project minimum to PHP 8.2.4 and then run the WP01 Composer **update** process, which will resolve CI4 4.7.6, Shield 1.4.1, Settings ^2.1 and their dependencies.
+
+This change updates `composer.json`, `public/index.php`, `spark`, the preflight checker, README and the SRS. CodeIgniter 4.7.6 and Shield 1.4.1 upstream manifests both require PHP ^8.2, so this version combination is supported at the declared package-constraint level. Actual installation is still subject to Composer platform resolution. The PHP 8.2.4 patch release is outdated: no public deployment or real member data is approved on this local runtime. Before staging/production, use a currently supported, security-patched PHP runtime and repeat the manual compatibility checks.
+
+**Run after pulling the latest branch:** `powershell -ExecutionPolicy Bypass -File scripts/bootstrap-windows.ps1 -PhpPath C:\xampp\php\php.exe`. Do not commit the stale lockfile. When the script passes, commit only the newly generated `composer.lock` and return the non-sensitive verification output for review.
