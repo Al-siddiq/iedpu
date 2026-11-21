@@ -16,6 +16,13 @@ final class CreateP2Organisation extends Migration
         if ($this->db->getPlatform() !== 'MySQLi' || $this->db->getPrefix() !== '') {
             throw new RuntimeException('P2 requires MySQLi with an empty table prefix.');
         }
+        $version = (string) $this->db->query('SELECT VERSION() AS server_version')->getRowArray()['server_version'];
+        $maria = stripos($version, 'MariaDB') !== false;
+        $numeric = preg_replace('/^5\.5\.5-(?=\d)/', '', $version);
+        if (!preg_match('/^\d+\.\d+\.\d+/', $numeric, $match)
+            || version_compare($match[0], $maria ? '10.4.0' : '8.0.16', '<')) {
+            throw new RuntimeException('P2 requires enforced CHECK constraints and generated columns; review server compatibility.');
+        }
         $user = $this->db->query("SELECT COLUMN_TYPE AS column_type FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'id'")->getRowArray();
         if (!preg_match('/^int(?:\(\d+\))? unsigned$/i', $user['column_type'] ?? '')) {
             throw new RuntimeException('Run official Shield migrations first; expected users.id INT UNSIGNED.');
