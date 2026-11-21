@@ -77,9 +77,9 @@ CREATE TABLE `portal_role_permissions` (
     `permission_id` BIGINT UNSIGNED NOT NULL,
     `granted_at` DATETIME(6) NOT NULL,
     `granted_by_user_id` INT UNSIGNED NULL,
-    FOREIGN KEY (`role_id`) REFERENCES `portal_roles` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    FOREIGN KEY (`permission_id`) REFERENCES `portal_permissions` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    FOREIGN KEY (`granted_by_user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    FOREIGN KEY (`role_id`) REFERENCES `portal_roles` (`id`),
+    FOREIGN KEY (`permission_id`) REFERENCES `portal_permissions` (`id`),
+    FOREIGN KEY (`granted_by_user_id`) REFERENCES `users` (`id`),
     UNIQUE (role_id,permission_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 SQL
@@ -103,7 +103,7 @@ CREATE TABLE `approval_requests` (
     `expires_at` DATETIME(6) NULL,
     UNIQUE (`public_id`),
     KEY (`action_key`),
-    FOREIGN KEY (`requested_by_user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    FOREIGN KEY (`requested_by_user_id`) REFERENCES `users` (`id`),
     KEY (subject_type,subject_id),
     CHECK (required_approvals >= 1),
     CHECK (approval_status IN ('pending','approved','rejected','cancelled','expired'))
@@ -121,8 +121,8 @@ CREATE TABLE `approval_decisions` (
     `decision` VARCHAR(20) NOT NULL,
     `decision_reason` TEXT NOT NULL,
     `decided_at` DATETIME(6) NOT NULL,
-    FOREIGN KEY (`approval_request_id`) REFERENCES `approval_requests` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    FOREIGN KEY (`approval_request_id`) REFERENCES `approval_requests` (`id`),
+    FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
     UNIQUE (approval_request_id,approver_user_id),
     CHECK (decision IN ('approved','rejected','returned'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
@@ -150,13 +150,13 @@ CREATE TABLE `portal_user_role_assignments` (
     `revoked_by_user_id` INT UNSIGNED NULL,
     `created_at` DATETIME(6) NOT NULL,
     UNIQUE (`public_id`),
-    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    FOREIGN KEY (`role_id`) REFERENCES `portal_roles` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    FOREIGN KEY (`zone_id`) REFERENCES `org_zones` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    FOREIGN KEY (`assigned_by_user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    FOREIGN KEY (`approval_request_id`) REFERENCES `approval_requests` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    FOREIGN KEY (`revoked_by_user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`role_id`) REFERENCES `portal_roles` (`id`),
+    FOREIGN KEY (`zone_id`) REFERENCES `org_zones` (`id`),
+    FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`),
+    FOREIGN KEY (`assigned_by_user_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`approval_request_id`) REFERENCES `approval_requests` (`id`),
+    FOREIGN KEY (`revoked_by_user_id`) REFERENCES `users` (`id`),
     CHECK ((scope_type='global' AND zone_id IS NULL AND branch_id IS NULL) OR (scope_type='zone' AND zone_id IS NOT NULL AND branch_id IS NULL) OR (scope_type='branch' AND branch_id IS NOT NULL)),
     CHECK (expires_at IS NULL OR expires_at > starts_at),
     CHECK (assignment_status IN ('active','suspended','revoked','expired')),
