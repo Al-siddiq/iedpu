@@ -157,3 +157,17 @@ All local vendors (Vue 3.5.24, Bootstrap 5.3.9 and Dexie 4.2.1) are committed. P
 ### Final P1 branding assets (required before starting the updated worker)
 
 After pulling the final branding refinement, run `powershell -ExecutionPolicy Bypass -File scripts/generate-brand-assets.ps1` on Windows. This produces the official IEDPU logo-derived raster icons and favicon from the committed public/assets/IEDPU.png without network access. Commit the eight generated files listed in WP04 documentation. The SVG Bootstrap Icons 1.13.1 sprite is already committed, no separate download required. The updated Service Worker will not install until all eight raster outputs exist.
+
+## P2-WP01 — Database foundation
+
+Follow [WP01 migration and manual verification runbook](docs/implementation/P2/WP01_Database_Foundation.md) on an isolated local DB. Official vendor migrations and 22 app tables; seed only the release-controlled permission catalogue. Authentication and all business routes remain disabled until WP02+. No real data or production deployment.
+
+## 2015 Constitution reader and DB-10
+
+The source-derived, read-only [Constitution reader](docs/implementation/P2/DB10_Constitutional_Reference_and_Reader.md) is available at `/constitution/2015` with a section index, schedules, search and mobile-friendly reading pages. This transcription is **pending source proofreading**, is **public preview only** until member authentication is implemented, and is not a legal amendment. The optional, owner-authorised `P2AncestralReferenceSeeder` imports exactly 11 inactive Section 2(a) references; it does not activate branches or membership.
+
+## P2-WP02 security boundary (in progress)
+
+P2-WP01 and DB-10 were accepted by the owner. The first P2-WP02 security increment is committed to the P2 branch, but **WP02 is not complete**. See [WP02 implementation and manual acceptance](docs/implementation/P2/WP02_Authentication_Scope_Governance_Audit.md).
+
+It disables public Shield registration, starter groups, magic links, remember-me and token/HMAC authentication; adds global CSRF protection, verified email/phone Shield session login, strict role/scope policy evaluation, a serialised audit chain, a local-only synthetic phone-only fixture, and a no-persistence auth client. **All role assignees are intentionally denied login pending real privileged MFA**; all administration/technical mutations remain disabled. Do not merge or deploy real accounts until the remaining invitation, MFA, approval, bootstrap, session revocation and acceptance gates are met.
