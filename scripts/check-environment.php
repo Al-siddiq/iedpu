@@ -40,13 +40,13 @@ echo "IEDPU P1-WP01 environment readiness\n";
 echo "PHP " . PHP_VERSION . " (" . PHP_SAPI . ")\n";
 echo str_repeat('-', 76) . "\n";
 
-$phpSupported = version_compare(PHP_VERSION, '8.4.0', '>=');
+$phpSupported = version_compare(PHP_VERSION, '8.2.4', '>=');
 report(
     'PHP runtime',
     $phpSupported,
     $phpSupported
-        ? (version_compare(PHP_VERSION, '8.5.0', '>=') ? '8.5+ preferred baseline satisfied.' : '8.4 fallback accepted; 8.5 is preferred.')
-        : 'PHP 8.4 or later is required by the approved IEDPU baseline.'
+        ? (version_compare(PHP_VERSION, '8.3.0', '>=') ? 'Compatible supported development runtime.' : 'PHP 8.2.4+ accepted for local WP01; update security patches before public deployment.')
+        : 'PHP 8.2.4 or later is required by the revised IEDPU WP01 baseline.'
 );
 
 foreach (['intl', 'mbstring', 'mysqli', 'openssl', 'fileinfo'] as $extension) {
