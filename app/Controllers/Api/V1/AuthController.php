@@ -116,16 +116,20 @@ final class AuthController extends BaseController
                 // Privileged login remains blocked until real MFA is approved.
                 return $failure($this);
             }
-            $result = $auth->attempt(['email' => $resolved['shield_secret'], 'password' => $password]);
+            // Shield::check verifies its password hash and rehashes as needed,
+            // without storing the raw email/phone in Shield's auth_logins table.
+            // Only the resolved, verified Shield identity may be checked.
+            $result = $auth->check(['email' => $resolved['shield_secret'], 'password' => $password]);
             if (!$result->isOK()) {
                 return $failure($this);
             }
-            $user = $auth->user();
+            $user = $result->extraInfo();
             if ($user === null || (int) $user->id !== $resolved['user_id']
                 || !$user->active || $user->isBanned()) {
-                $auth->logout();
                 return $failure($this);
             }
+            // Shield's supported session login method rotates the session ID.
+            $auth->login($user);
 
             // Audit must be durable before an authenticated session is returned.
             (new AuditTrail($db))->append([
