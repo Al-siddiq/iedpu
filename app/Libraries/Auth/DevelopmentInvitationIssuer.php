@@ -110,6 +110,21 @@ final class DevelopmentInvitationIssuer
                 return null;
             }
 
+            // Lock issuer and its role assignments before the final permission
+            // decision. Compliant role-grant/revocation writers must lock the
+            // same issuer user row before modifying assignments. This avoids
+            // a check-then-issue gap for cooperating governance writers.
+            $issuer = $this->db->query(
+                'SELECT id,active FROM users WHERE id=? FOR UPDATE', [$issuerId]
+            )->getRowArray();
+            if ($issuer === null || (int) $issuer['active'] !== 1) {
+                return null;
+            }
+            $this->db->query(
+                'SELECT id FROM portal_user_role_assignments WHERE user_id=? FOR UPDATE',
+                [$issuerId]
+            )->getResultArray();
+
             // Scope and permission must still be valid at issuance time.
             if (!(new ScopeAuthorizer($this->db))->allows(
                 $issuerId, 'users.invite', $scope, $zoneId, $branchId
