@@ -15,7 +15,7 @@ function showFatal(message) {
     console.error(message);
 }
 
-if (!root || !window.Vue || !window.Vue.createApp || !window.Vue.ref) {
+if (!root || !window.Vue || window.Vue.version !== '3.5.24' || !window.Vue.createApp || !window.Vue.ref) {
     showFatal('The locally hosted Vue 3 production asset is missing or invalid.');
 } else {
     try {
