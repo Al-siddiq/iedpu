@@ -16,3 +16,9 @@ The four-work-package P2 plan is accepted with this binding additional requireme
 - Production delivery channel/provider and recovery operating procedure remain activation decisions. No scope expansion to public membership registration or P4 claims.
 
 Status: planning decision recorded; implementation and verification pending.
+
+## P2-AUTH-02 — Approved authenticator-app MFA (21 November 2026)
+
+Owner accepted the recommendation to use authenticator-app TOTP for all privileged accounts, without mandatory TOTP for ordinary members and without a recurring SMS dependency. Google Authenticator is an example, not a vendor lock-in; other RFC6238-compatible apps must work. Guided QR setup, offline recovery codes, and independent approval for lost-device privileged recovery are mandatory. Phone-or-email login from P2-AUTH-01 remains unchanged. Implementation and manual acceptance are recorded in [P2-AUTH-02 TOTP Decision and Acceptance](P2_AUTH02_TOTP_Decision_and_Acceptance.md).
+
+**No SMS fallback or privileged factor reset is authorised by this decision.** Account recovery and high-risk step-up are separate pending gates.
