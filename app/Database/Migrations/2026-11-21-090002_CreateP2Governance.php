@@ -13,7 +13,7 @@ final class CreateP2Governance extends Migration
 
     public function up(): void
     {
-        if ($this->db->getPlatform() !== 'MySQLi' || $this->db->DBPrefix !== '') {
+        if ($this->db->getPlatform() !== 'MySQLi' || $this->db->getPrefix() !== '') {
             throw new RuntimeException('P2 requires MySQLi with an empty table prefix.');
         }
         $user = $this->db->query("SELECT COLUMN_TYPE AS column_type FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'id'")->getRowArray();
@@ -119,7 +119,7 @@ CREATE TABLE `approval_decisions` (
     `approval_request_id` BIGINT UNSIGNED NOT NULL,
     `approver_user_id` INT UNSIGNED NOT NULL,
     `decision` VARCHAR(20) NOT NULL,
-    `decision_reason` TEXT NULL,
+    `decision_reason` TEXT NOT NULL,
     `decided_at` DATETIME(6) NOT NULL,
     FOREIGN KEY (`approval_request_id`) REFERENCES `approval_requests` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
     FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
