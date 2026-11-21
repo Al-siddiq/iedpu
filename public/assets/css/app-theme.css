@@ -189,3 +189,6 @@ button.connection-chip { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* PWA prompt is separate from Vue and never covers the mobile bottom navigation. */
+.pwa-notice{position:fixed;z-index:50;right:18px;bottom:18px;max-width:min(390px,calc(100vw - 36px));background:#fff;border:1px solid var(--iedpu-border);border-radius:14px;box-shadow:0 10px 32px #17324d22;padding:16px}.pwa-notice[hidden],.pwa-notice button[hidden]{display:none!important}.pwa-notice p{font-size:14px;margin:0 0 10px}.pwa-notice .btn{margin:3px 4px 0 0}@media(max-width:700px){.pwa-notice{bottom:calc(80px + env(safe-area-inset-bottom));right:12px;max-width:calc(100vw - 24px)}}
