@@ -7,6 +7,7 @@ use App\Controllers\BaseController;
 use App\Libraries\Api\ApiInput;
 use App\Libraries\Api\ApiResponder;
 use App\Libraries\Auth\TotpFactor;
+use App\Libraries\Auth\SessionVersion;
 use App\Libraries\Auth\VerifiedIdentifierResolver;
 use App\Libraries\Security\AuditTrail;
 use App\Libraries\Security\RequestId;
@@ -125,6 +126,7 @@ final class MfaController extends BaseController
                 return $this->error(401, 'unauthenticated', 'Sign in again.');
             }
             auth('session')->login($user);
+            (new SessionVersion($db))->stamp($pending['user_id']);
             session()->set('iedpu_mfa_verified_user', $pending['user_id']);
             session()->remove('iedpu_mfa_pending');
             (new AuditTrail($db))->append([
@@ -146,8 +148,7 @@ final class MfaController extends BaseController
             ]);
         } catch (Throwable) {
             auth('session')->logout();
-            session()->remove('iedpu_mfa_pending');
-            session()->remove('iedpu_mfa_verified_user');
+            SessionVersion::clearLocal();
             return $this->error(503, 'mfa_unavailable', 'Authenticator verification is temporarily unavailable. Sign in again.');
         }
     }
