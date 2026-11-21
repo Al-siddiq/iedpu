@@ -39,7 +39,7 @@ CREATE TABLE `portal_login_identifiers` (
     `created_at` DATETIME(6) NOT NULL,
     `updated_at` DATETIME(6) NULL,
     UNIQUE (`public_id`),
-    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
     CHECK (identifier_type IN ('email','phone')),
     CHECK (status IN ('pending','active','revoked')),
     CHECK (status <> 'active' OR (verified_at IS NOT NULL AND revoked_at IS NULL)),
