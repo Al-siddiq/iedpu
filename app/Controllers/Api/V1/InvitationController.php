@@ -26,7 +26,9 @@ final class InvitationController extends BaseController {
  }
  private function json(array $keys): ?array {
   $parsed=ApiInput::jsonObject($this->request,4096);
-  if (!$parsed['ok']||array_keys($parsed['data'])!==$keys) return null;
+  if (!$parsed['ok']) return null;
+  $actual=array_keys($parsed['data']);sort($actual);sort($keys);
+  if ($actual!==$keys) return null;
   return $parsed['data'];
  }
  private function rate(int $id,string $action): bool {
@@ -70,7 +72,7 @@ final class InvitationController extends BaseController {
    $parsed=ApiInput::jsonObject($this->request,2048);
    if (!$parsed['ok']) return $this->reject(422,'invalid_request');
    $d=$parsed['data'];
-   if (array_keys($d)!==['user_id','token','password']||!is_int($d['user_id'])
+   if (count($d)!==3||!array_key_exists('user_id',$d)||!array_key_exists('token',$d)||!array_key_exists('password',$d)||!is_int($d['user_id'])
     ||!is_string($d['token'])||!is_string($d['password'])) return $this->reject(422,'invalid_request');
    if (!service('throttler')->check('iedpu-invite-activation-'.hash('sha256',$this->request->getIPAddress()),8,3600)
     ||!service('throttler')->check('iedpu-invite-activation-user-'.hash('sha256',(string)$d['user_id']),8,3600)) return $this->reject(429,'rate_limited');
