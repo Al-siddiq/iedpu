@@ -51,3 +51,26 @@ Use [x] only after actual inspection. Do not substitute the owner's 13 successfu
 The SMTP dispatcher treats a process crash after claiming a message as an uncertain state requiring manual reconciliation; this is intentional fail-closed behavior but requires an operational procedure. The preflight validates SMTP configuration presence, **not connection**. The structural acceptance command does not substitute for the user's browser, mail and two-session tests. The invitation page and email URL must be verified under the actual deployment base path.
 
 **Current decision: HOLD for production enablement; no indication that the user's reported functional acceptance failed.**
+
+
+## Source-code security review — 2026-11-22
+
+**Review scope:** Direct inspection of `Routes.php`, `Filters.php`, `InvitationPage.php`, `ApprovedInvitationRelease.php`, `InvitationActivation.php`, `P2InvitationSmtpDispatch.php` and `P2InvitationReconcile.php` on the feature branch. This is a targeted static review, **not** a comprehensive independent audit, penetration test, deployment inspection or live SMTP check.
+
+### Findings requiring resolution or verification
+
+1. **P2-SR-01 — Activation page deployment path (release blocker for subdirectory deployments).** `InvitationPage.php` hardcodes `/api/v1/auth/csrf`, `/api/v1/auth/invitations/activate`, and `/sign-in`. Those resolve against the host root, not necessarily the CI4 application base path. Use framework-generated URLs or a validated application base path and verify both root-hosted and subdirectory deployments.
+2. **P2-SR-02 — CSP hardening (security review required).** The activation page declares `script-src 'unsafe-inline'` and `style-src 'unsafe-inline'`. Move script/style to same-origin static assets or use a per-response nonce, and retest activation under the hardened policy.
+3. **P2-SR-03 — SMTP completion semantics (operational evidence).** `Email::send(false)` success means the configured SMTP transport accepted the send, not proof of recipient inbox delivery. Verify controlled-mailbox receipt, sender authentication, bounce handling and monitoring; avoid treating the `sent` database status as delivery confirmation.
+4. **P2-SR-04 — Interrupted-dispatch handling (operational release blocker).** Dispatcher intentionally leaves `sending` state on an uncertain exception; operator reconciliation is required and no automatic resend should occur. Establish alerts, incident ownership, evidence preservation and an explicit revoke procedure; verify the procedure in the deployment environment.
+5. **P2-SR-05 — Deployment controls (not remotely verified).** HTTPS/proxy/cookie configuration, secret storage and backup, database restore, least-privilege scheduler, production SMTP connectivity, and deployment rollback cannot be certified from repository source or user-reported functional tests.
+6. **P2-SR-06 — Exact revision and independent review.** Record the SHA actually tested; changes after that SHA need review and proportionate regression testing. Obtain a named independent security reviewer before final approval.
+
+### Positive controls observed in code
+
+- Routes explicitly declare invitation operations; global CSRF filter is configured.
+- `ApprovedInvitationRelease` requires a separate approver, checks permission scope, revalidates eligibility and binds the invitation to the approved intent.
+- `InvitationActivation` checks inactive account state, excludes preassigned roles and MFA factors, and uses single-use token redemption in an audited mutation.
+- SMTP dispatcher encrypts pending outbox token material at rest, revokes on explicit send failure and does not automatically retry uncertain sends.
+
+**Disposition:** Functional acceptance remains owner-reported PASS; static security review is **OPEN** with findings above; production authorization remains **HOLD**.
