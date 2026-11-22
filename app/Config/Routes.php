@@ -38,6 +38,11 @@ $routes->group('api/v1', ['namespace' => 'App\\Controllers\\Api\\V1'], static fu
     $routes->post('auth/password/change', 'PasswordController::change');
     $routes->get('auth/mfa/setup', 'MfaController::setup');
     $routes->post('auth/mfa/verify', 'MfaController::verify');
+    // Approved invitation workflow: protected maker/checker/issuer and public token redemption.
+    $routes->post('auth/invitations/request', 'InvitationController::requestApproval');
+    $routes->post('auth/invitations/decide', 'InvitationController::decide');
+    $routes->post('auth/invitations/issue', 'InvitationController::issue');
+    $routes->post('auth/invitations/activate', 'InvitationController::activate');
     $routes->add('auth', 'UnavailableController::disabled');
     $routes->add('auth/(:any)', 'UnavailableController::disabled');
 
