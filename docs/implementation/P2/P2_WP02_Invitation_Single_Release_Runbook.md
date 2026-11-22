@@ -36,7 +36,7 @@ Generate the encryption key once with `php -r "echo base64_encode(random_bytes(3
 
 ## Failure and recovery
 
-If SMTP explicitly returns failure, the worker revokes the pending token in a second audited transaction and marks the outbox failed. If the process crashes after claiming or SMTP succeeds but finalization fails, the row remains `sending`; **never automatically resend**. Treat it as an uncertain-delivery incident, stop dispatch, investigate with a second operator, revoke the token in an audited approved operation, then issue a fresh invitation through a new approval. No automatic recovery command is implemented. This fail-closed operational hold must be resolved before production launch.
+If SMTP explicitly returns failure, the worker revokes the pending token in a second audited transaction and marks the outbox failed. If the process crashes after claiming or SMTP succeeds but finalization fails, the row remains `sending`; **never automatically resend**. Treat it as an uncertain-delivery incident, stop dispatch, investigate with a second operator, run \`php spark iedpu:p2-invitation-reconcile --token-public-id=<UUID> --confirm-revoke\` under an approved, recorded incident process, then issue a fresh invitation through a new approval. No automatic recovery command is implemented. This fail-closed operational hold must be resolved before production launch.
 
 ## Important remaining release holds
 
