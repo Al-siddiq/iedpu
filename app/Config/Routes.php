@@ -7,6 +7,7 @@ use CodeIgniter\Router\RouteCollection;
 /** @var RouteCollection $routes */
 $routes->get('/', 'Home::index');
 $routes->get('sign-in', 'SignIn::index');
+$routes->get('invitation/activate', 'InvitationPage::index');
 $routes->get('administration/workspace', 'AdminWorkspace::index');
 $routes->get('account/security', 'AccountSecurity::index');
 
