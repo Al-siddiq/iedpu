@@ -49,7 +49,7 @@ final class P2InvitationSmtpDispatch extends BaseCommand {
     'SMTPCrypto'=>$port===465?'ssl':'tls','SMTPTimeout'=>10,'mailType'=>'text','charset'=>'UTF-8',
     'newline'=>"\r\n",'CRLF'=>"\r\n",'validate'=>true]);
    $email->setFrom($from,'IEDPU')->setTo($row['recipient'])->setSubject('Your IEDPU account invitation');
-   $email->setMessage("An invitation to activate your IEDPU account has been approved.\n\nOpen the secure activation page: ".$origin."/sign-in\n\nAccount ID: ".$row['user_id']."\nInvitation token: ".$token."\n\nThe token expires within 24 hours. Do not share it. If unexpected, ignore this email.");
+   $email->setMessage("An invitation to activate your IEDPU account has been approved.\n\nOpen the secure activation page: ".$origin."/invitation/activate\n\nAccount ID: ".$row['user_id']."\nInvitation token: ".$token."\n\nThe token expires within 24 hours. Do not share it. If unexpected, ignore this email.");
    $sent=$email->send(false);
    (new AtomicAuditedMutation($db))->run(function() use($db,$row,$sent): void {
     $locked=$db->query('SELECT status FROM portal_invitation_outbox WHERE id=? FOR UPDATE',[$row['id']])->getRowArray();
