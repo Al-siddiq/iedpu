@@ -58,14 +58,14 @@ final class P2InvitationSmtpDispatch extends BaseCommand {
      $db->query("UPDATE portal_account_action_tokens SET status='revoked',revoked_at=UTC_TIMESTAMP(6) WHERE public_id=? AND status='pending'",[$row['token_public_id']]);
     }
     $db->table('portal_invitation_outbox')->where('id',$row['id'])->update([
-     'status'=>$sent?'sent':'failed', $sent?'delivered_at':'failed_at'=>gmdate('Y-m-d H:i:s'),'ciphertext'=>''
+     'status'=>$sent?'sent':'failed', $sent?'smtp_accepted_at':'failed_at'=>gmdate('Y-m-d H:i:s'),'ciphertext'=>''
     ]);
     (new AuditTrail($db))->append(['action_key'=>$sent?'auth.invitation_smtp_sent':'auth.invitation_smtp_failed_revoked',
      'module_code'=>'security','event_category'=>'security','outcome'=>$sent?'success':'failure',
      'subject_type'=>'user','subject_id'=>$row['user_id']]);
     if (!$db->transStatus()) throw new RuntimeException('Dispatch finalization failed');
    });
-   CLI::write($sent?'OK   Invitation sent and audited.':'FAIL   SMTP failed; token revoked and audited.', $sent?'green':'red');
+   CLI::write($sent?'OK   SMTP relay accepted the message; recipient inbox delivery is not confirmed.':'FAIL   SMTP failed; token revoked and audited.', $sent?'green':'red');
    return $sent?0:1;
   } catch(Throwable $e) {
    // A claimed message with unknown SMTP outcome is NEVER automatically resent.
