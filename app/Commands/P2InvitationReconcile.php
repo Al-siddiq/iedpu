@@ -15,9 +15,12 @@ final class P2InvitationReconcile extends BaseCommand {
  protected $description='Revoke an uncertain SMTP invitation with audited, explicit CLI confirmation.';
  public function run(array $params): int {
   $id=CLI::getOption('token-public-id');
-  if (!is_string($id)||!preg_match('/\A[a-f0-9-]{36}\z/iD',$id)
+  $ticket=CLI::getOption('incident-ticket');
+  if ((string)env('IEDPU_INVITATION_RECONCILE_ENABLED','0')!=='1'
+   ||!is_string($id)||!preg_match('/\A[a-f0-9-]{36}\z/iD',$id)
+   ||!is_string($ticket)||!preg_match('/\A[A-Z][A-Z0-9-]{5,39}\z/D',$ticket)
    ||CLI::getOption('confirm-revoke')===null) {
-   CLI::write('REFUSED: --token-public-id=<UUID> --confirm-revoke required.','red');return 1;
+   CLI::write('REFUSED: reconciliation disabled by default. Requires an approved two-person incident procedure, IEDPU_INVITATION_RECONCILE_ENABLED=1, --incident-ticket=REF-12345, --token-public-id=<UUID> and --confirm-revoke.','red');return 1;
   }
   try {
    $db=Database::connect();
@@ -38,7 +41,7 @@ final class P2InvitationReconcile extends BaseCommand {
      'subject_type'=>'user','subject_id'=>(int)$token['user_id']]);
     if (!$db->transStatus()) throw new RuntimeException('Reconciliation transaction failed');
    });
-   CLI::write('OK   Uncertain invitation revoked and audited. Do not resend; create a new approved request.','green');return 0;
+   CLI::write('OK   Uncertain invitation revoked and audited. Retain two-person approval evidence for ticket '.$ticket.'. Do not resend; create a new approved request.','green');return 0;
   }catch(Throwable $e){CLI::write('HOLD: Reconciliation failed; preserve incident evidence.','red');return 1;}
  }
 }
