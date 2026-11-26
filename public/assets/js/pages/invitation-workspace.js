@@ -104,8 +104,8 @@
           <p>Recipient: ${escapeHtml(item.email)}</p><p>${escapeHtml(item.request_reason)}</p></div>
           <span class="status ${approved ? 'approved' : ''}">${escapeHtml(label)}</span></div>
         <div class="record-actions">
-          ${approved ? `<button class="action issue" type="button" data-action="issue" data-id="${Number(item.id)}">Issue invitation</button>` : ''}
-          ${approved ? `<button class="action" type="button" data-action="preview" data-id="${Number(item.id)}">Get local activation token</button>` : ''}
+          ${approved && item.execution_status === 'pending' ? `<button class="action issue" type="button" data-action="issue" data-id="${Number(item.id)}">Issue invitation</button>` : ''}
+          ${approved && item.execution_status === 'executed' ? `<button class="action" type="button" data-action="preview" data-id="${Number(item.id)}">Get local activation token</button>` : ''}
         </div>
         <div class="local-result" id="local-result-${Number(item.id)}"></div>
       </article>`;
@@ -175,8 +175,8 @@
       } else if (action === 'issue') {
         await api('api/v1/auth/invitations/issue', 'POST', { approval_request_id: requestId });
         message('Invitation issued and placed in the local delivery outbox. Retrieve the local activation token below.', 'success');
-        await showPreview(requestId);
         await load();
+        await showPreview(requestId);
       } else if (action === 'preview') {
         await showPreview(requestId);
       }
