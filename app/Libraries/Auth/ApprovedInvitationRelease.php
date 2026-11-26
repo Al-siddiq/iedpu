@@ -71,6 +71,26 @@ final class ApprovedInvitationRelease {
    if (!$this->db->transStatus()) throw new RuntimeException('Approval decision failed');
   });
  }
+ public function localPreview(int $actor,int $requestId): array {
+  if (ENVIRONMENT!=='development' || !in_array((string)$this->db->hostname,['localhost','127.0.0.1','::1'],true)
+   || (string)$this->db->database!=='iedpu_disposable_invitation') throw new RuntimeException('Local preview is only available on the disposable test database');
+  $row=$this->db->query("SELECT r.requested_by_user_id,t.user_id,t.public_id,t.status,t.token_hash,o.recipient,o.ciphertext
+    FROM approval_requests r
+    JOIN portal_account_action_tokens t ON t.approval_request_id=r.id
+    JOIN portal_invitation_outbox o ON o.token_public_id=t.public_id
+    WHERE r.id=? AND r.action_key='account.invite' ORDER BY t.id DESC LIMIT 1",[$requestId])->getRowArray();
+  if (!$row || (int)$row['requested_by_user_id']!==$actor || $row['status']!=='pending' || $row['ciphertext']==='') {
+   throw new RuntimeException('No local invitation preview is available');
+  }
+  $token=InvitationOutboxCrypto::open((string)$row['ciphertext']);
+  if (!hash_equals((string)$row['token_hash'],hash('sha256',$token))) throw new RuntimeException('Invitation token integrity check failed');
+  (new AuditTrail($this->db))->append([
+   'action_key'=>'auth.invitation_local_previewed','module_code'=>'security','event_category'=>'security',
+   'outcome'=>'success','actor_user_id'=>$actor,'subject_type'=>'user','subject_id'=>(int)$row['user_id'],
+   'request_id'=>RequestId::current()
+  ]);
+  return ['user_id'=>(int)$row['user_id'],'email'=>(string)$row['recipient'],'token'=>$token];
+ }
  public function issue(int $actor,int $requestId): void {
   if ($requestId<1) throw new RuntimeException('Invalid request');
   (new AtomicAuditedMutation($this->db))->run(function() use($actor,$requestId): void {
