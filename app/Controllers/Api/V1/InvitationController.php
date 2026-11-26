@@ -109,6 +109,16 @@ final class InvitationController extends BaseController {
    return ApiResponder::success($this->request,$this->response,['queued'=>true],202);
   }catch(Throwable){return $this->reject(403,'invitation_denied');}
  }
+ public function localPreview(): ResponseInterface {
+  try {
+   $id=$this->actor();if ($id===null) return $this->reject(401,'unauthenticated');
+   if (!$this->rate($id,'preview')) return $this->reject(429,'rate_limited');
+   $d=$this->json(['approval_request_id']);
+   if ($d===null||!is_int($d['approval_request_id'])) return $this->reject(422,'invalid_request');
+   $preview=(new ApprovedInvitationRelease(db_connect()))->localPreview($id,$d['approval_request_id']);
+   return ApiResponder::success($this->request,$this->response,$preview);
+  }catch(Throwable){return $this->reject(403,'local_preview_unavailable');}
+ }
  public function activate(): ResponseInterface {
   try {
    $parsed=ApiInput::jsonObject($this->request,2048);
