@@ -55,7 +55,7 @@ final class InvitationController extends BaseController {
       ORDER BY u.id, i.id")->getResultArray();
     $candidates=$rows;
     $mine=$db->query("SELECT r.id,r.subject_id AS target_user_id,r.request_reason,r.approval_status,r.submitted_at,
-       i.normalised_value AS email
+       i.normalised_value AS email,b.execution_status
       FROM approval_requests r
       JOIN portal_approval_action_bindings b ON b.approval_request_id=r.id
       JOIN portal_login_identifiers i ON i.id=CAST(JSON_UNQUOTE(JSON_EXTRACT(b.proposed_change_json,'$.identifier_id')) AS UNSIGNED)
