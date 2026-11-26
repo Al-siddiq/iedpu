@@ -9,6 +9,7 @@ $routes->get('/', 'Home::index');
 $routes->get('sign-in', 'SignIn::index');
 $routes->get('invitation/activate', 'InvitationPage::index');
 $routes->get('administration/workspace', 'AdminWorkspace::index');
+$routes->get('administration/invitations', 'InvitationWorkspace::index');
 $routes->get('account/security', 'AccountSecurity::index');
 
 // P1-WP03: public, read-only visual previews. These routes confer no access
@@ -40,9 +41,11 @@ $routes->group('api/v1', ['namespace' => 'App\\Controllers\\Api\\V1'], static fu
     $routes->get('auth/mfa/setup', 'MfaController::setup');
     $routes->post('auth/mfa/verify', 'MfaController::verify');
     // Approved invitation workflow: protected maker/checker/issuer and public token redemption.
+    $routes->get('auth/invitations/workspace', 'InvitationController::workspaceData');
     $routes->post('auth/invitations/request', 'InvitationController::requestApproval');
     $routes->post('auth/invitations/decide', 'InvitationController::decide');
     $routes->post('auth/invitations/issue', 'InvitationController::issue');
+    $routes->post('auth/invitations/local-preview', 'InvitationController::localPreview');
     $routes->post('auth/invitations/activate', 'InvitationController::activate');
     $routes->add('auth', 'UnavailableController::disabled');
     $routes->add('auth/(:any)', 'UnavailableController::disabled');
