@@ -52,6 +52,14 @@ final class InvitationController extends BaseController {
        AND NOT EXISTS (SELECT 1 FROM portal_user_role_assignments a WHERE a.user_id=u.id)
        AND NOT EXISTS (SELECT 1 FROM portal_totp_factors f WHERE f.user_id=u.id)
        AND NOT EXISTS (SELECT 1 FROM auth_identities x WHERE x.user_id=u.id)
+       AND NOT EXISTS (
+        SELECT 1 FROM approval_requests r
+        JOIN portal_approval_action_bindings b ON b.approval_request_id=r.id
+        WHERE r.action_key='account.invite' AND r.subject_id=u.id
+         AND (r.approval_status='pending'
+          OR (r.approval_status='approved' AND b.execution_status='pending')
+          OR EXISTS (SELECT 1 FROM portal_account_action_tokens t WHERE t.approval_request_id=r.id AND t.status='pending'))
+       )
       ORDER BY u.id, i.id")->getResultArray();
     $candidates=$rows;
     $mine=$db->query("SELECT r.id,r.subject_id AS target_user_id,r.request_reason,r.approval_status,r.submitted_at,
