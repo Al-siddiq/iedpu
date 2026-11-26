@@ -7,10 +7,11 @@ use App\Libraries\Api\ApiResponder;
 use App\Libraries\Auth\ApprovedInvitationRelease;
 use App\Libraries\Auth\InvitationActivation;
 use App\Libraries\Auth\InvitationIssuerSessionGate;
+use App\Libraries\Auth\ScopeAuthorizer;
 use App\Libraries\Auth\SessionVersion;
 use CodeIgniter\HTTP\ResponseInterface;
 use Throwable;
-/** CSRF-protected explicit routes; all privileged calls require Shield+MFA. */
+/** CSRF-protected invitation request, maker/checker approval and issue API. */
 final class InvitationController extends BaseController {
  private function reject(int $status,string $code): ResponseInterface {
   return ApiResponder::error($this->request,$this->response,$status,$code,'Invitation request cannot be completed.');
@@ -34,6 +35,47 @@ final class InvitationController extends BaseController {
  private function rate(int $id,string $action): bool {
   return service('throttler')->check('iedpu-invite-'.$action.'-'.hash('sha256',(string)$id),10,3600)
    && service('throttler')->check('iedpu-invite-net-'.hash('sha256',$this->request->getIPAddress()),30,3600);
+ }
+ public function workspaceData(): ResponseInterface {
+  try {
+   $id=$this->actor();if ($id===null) return $this->reject(401,'unauthenticated');
+   $policy=new ScopeAuthorizer(db_connect());
+   $canRequest=$policy->allows($id,'users.invite','global');
+   $canApprove=$policy->allows($id,'approvals.decide','global');
+   $canView=$policy->allows($id,'approvals.view','global');
+   $db=db_connect();$candidates=[];$pending=[];$mine=[];
+   if ($canRequest) {
+    $rows=$db->query("SELECT u.id AS target_user_id, i.id AS identifier_id, i.normalised_value AS email
+      FROM users u JOIN portal_login_identifiers i ON i.user_id=u.id
+      WHERE u.active=0 AND i.identifier_type='email' AND i.status='pending'
+       AND i.verified_at IS NULL AND i.revoked_at IS NULL
+       AND NOT EXISTS (SELECT 1 FROM portal_user_role_assignments a WHERE a.user_id=u.id)
+       AND NOT EXISTS (SELECT 1 FROM portal_totp_factors f WHERE f.user_id=u.id)
+       AND NOT EXISTS (SELECT 1 FROM auth_identities x WHERE x.user_id=u.id)
+      ORDER BY u.id, i.id")->getResultArray();
+    $candidates=$rows;
+    $mine=$db->query("SELECT r.id,r.subject_id AS target_user_id,r.request_reason,r.approval_status,r.submitted_at,
+       i.normalised_value AS email
+      FROM approval_requests r
+      JOIN portal_approval_action_bindings b ON b.approval_request_id=r.id
+      JOIN portal_login_identifiers i ON i.id=CAST(JSON_UNQUOTE(JSON_EXTRACT(b.proposed_change_json,'$.identifier_id')) AS UNSIGNED)
+      WHERE r.action_key='account.invite' AND r.requested_by_user_id=?
+      ORDER BY r.id DESC LIMIT 50",[$id])->getResultArray();
+   }
+   if ($canView || $canApprove) {
+    $pending=$db->query("SELECT r.id,r.subject_id AS target_user_id,r.requested_by_user_id,r.request_reason,r.approval_status,r.submitted_at,
+       i.normalised_value AS email
+      FROM approval_requests r
+      JOIN portal_approval_action_bindings b ON b.approval_request_id=r.id
+      JOIN portal_login_identifiers i ON i.id=CAST(JSON_UNQUOTE(JSON_EXTRACT(b.proposed_change_json,'$.identifier_id')) AS UNSIGNED)
+      WHERE r.action_key='account.invite' AND r.approval_status='pending' AND r.requested_by_user_id<>?
+      ORDER BY r.id ASC LIMIT 50",[$id])->getResultArray();
+   }
+   return ApiResponder::success($this->request,$this->response,[
+    'can_request'=>$canRequest,'can_approve'=>$canApprove,'can_issue'=>$canRequest,
+    'candidates'=>$candidates,'pending_approvals'=>$pending,'my_requests'=>$mine
+   ]);
+  }catch(Throwable){return $this->reject(503,'invitation_workspace_unavailable');}
  }
  public function requestApproval(): ResponseInterface {
   try {
