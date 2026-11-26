@@ -19,11 +19,11 @@ final class ApprovedInvitationRelease {
   if (!$u || !$i || (int)$i['user_id']!==$target) throw new RuntimeException('Invalid invitation subject');
   return hash('sha256',json_encode([$u,$i],JSON_THROW_ON_ERROR));
  }
- private function authorize(int $actor,string $scope,?int $zone,?int $branch): bool {
-  return (new ScopeAuthorizer($this->db))->allows($actor,'users.invite',$scope,$zone,$branch);
+ private function authorize(int $actor,string $permission,string $scope,?int $zone,?int $branch): bool {
+  return (new ScopeAuthorizer($this->db))->allows($actor,$permission,$scope,$zone,$branch);
  }
  public function request(int $actor,int $target,int $identifier,string $scope,?int $zone,?int $branch,string $reason): int {
-  if (mb_strlen($reason)<10 || mb_strlen($reason)>500 || !$this->authorize($actor,$scope,$zone,$branch)
+  if (mb_strlen($reason)<10 || mb_strlen($reason)>500 || !$this->authorize($actor,'users.invite',$scope,$zone,$branch)
     || !(new InvitationIssuanceEligibility($this->db))->allows($actor,$target,$identifier,$scope,$zone,$branch)) throw new RuntimeException('Invitation request denied');
   return (new AtomicAuditedMutation($this->db))->run(function() use($actor,$target,$identifier,$scope,$zone,$branch,$reason): int {
    $this->db->query('SELECT id FROM users WHERE id=? FOR UPDATE',[$target]);
@@ -57,7 +57,7 @@ final class ApprovedInvitationRelease {
    if (!$r||!$b||$r['action_key']!=='account.invite'||$r['approval_status']!=='pending'
     ||$b['execution_status']!=='pending'||(int)$r['requested_by_user_id']===$checker
     ||$r['expires_at']===null||$r['expires_at']<=gmdate('Y-m-d H:i:s')
-    ||!$this->authorize($checker,$b['scope_type'],$b['zone_id']===null?null:(int)$b['zone_id'],$b['branch_id']===null?null:(int)$b['branch_id']))
+    ||!$this->authorize($checker,'approvals.decide',$b['scope_type'],$b['zone_id']===null?null:(int)$b['zone_id'],$b['branch_id']===null?null:(int)$b['branch_id']))
     throw new RuntimeException('Independent approval denied');
    $this->db->table('approval_decisions')->insert(['approval_request_id'=>$requestId,'approver_user_id'=>$checker,
     'decision'=>$approve?'approved':'rejected','decision_reason'=>$reason,'decided_at'=>gmdate('Y-m-d H:i:s')]);
@@ -87,7 +87,7 @@ final class ApprovedInvitationRelease {
    $this->db->query('SELECT id FROM users WHERE id=? FOR UPDATE',[$target]);
    $this->db->query('SELECT id FROM users WHERE id=? FOR UPDATE',[$actor]);
    $this->db->query('SELECT id FROM portal_user_role_assignments WHERE user_id=? FOR UPDATE',[$actor]);
-   if (!$this->authorize($actor,$scope,$zone,$branch)
+   if (!$this->authorize($actor,'users.invite',$scope,$zone,$branch)
     ||!(new InvitationIssuanceEligibility($this->db))->allows($actor,$target,$identifier,$scope,$zone,$branch)
     ||!hash_equals((string)$b['expected_state_sha256'],$this->state($target,$identifier))
     ||!hash_equals((string)$b['intent_sha256'],ApprovalIntent::digest('account.invite','user',$target,$scope,$zone,$branch,(string)$b['expected_state_sha256'],$change)))
