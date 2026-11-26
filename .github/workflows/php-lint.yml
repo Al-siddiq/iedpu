@@ -24,3 +24,5 @@ jobs:
         run: php scripts/test-p2-login-identifier.php
       - name: Invitation release hardening smoke
         run: php scripts/test-p2-invitation-release-hardening.php
+      - name: Invitation workspace source contract
+        run: php scripts/test-p2-invitation-workspace.php
