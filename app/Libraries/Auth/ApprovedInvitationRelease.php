@@ -28,6 +28,13 @@ final class ApprovedInvitationRelease {
   return (new AtomicAuditedMutation($this->db))->run(function() use($actor,$target,$identifier,$scope,$zone,$branch,$reason): int {
    $this->db->query('SELECT id FROM users WHERE id=? FOR UPDATE',[$target]);
    if (!(new InvitationIssuanceEligibility($this->db))->allows($actor,$target,$identifier,$scope,$zone,$branch)) throw new RuntimeException('Invitation no longer eligible');
+   $open=$this->db->query("SELECT COUNT(*) AS n FROM approval_requests r
+     JOIN portal_approval_action_bindings b ON b.approval_request_id=r.id
+     WHERE r.action_key='account.invite' AND r.subject_id=?
+      AND (r.approval_status='pending'
+       OR (r.approval_status='approved' AND b.execution_status='pending')
+       OR EXISTS (SELECT 1 FROM portal_account_action_tokens t WHERE t.approval_request_id=r.id AND t.status='pending'))",[$target])->getRowArray();
+   if ((int)($open['n']??0)>0) throw new RuntimeException('An invitation request or active invitation already exists');
    $state=$this->state($target,$identifier);
    $change=['identifier_id'=>$identifier];
    $digest=ApprovalIntent::digest('account.invite','user',$target,$scope,$zone,$branch,$state,$change);
