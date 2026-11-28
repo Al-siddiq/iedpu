@@ -1,0 +1,26 @@
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#17324d;background:#f3f6f9}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;line-height:1.55}
+.top{padding:20px max(18px,calc((100% - 1000px)/2))}
+.top a{color:#17324d}
+.card{background:white;max-width:490px;margin:16px auto 45px;padding:clamp(22px,5vw,38px);border:1px solid #d8e1ea;border-radius:16px;box-shadow:0 12px 40px #17324d13}
+.mark{background:#17324d;color:#fff;display:inline-block;border-radius:9px;padding:10px 13px;font-weight:800;letter-spacing:.05em}
+.eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:#8c2535;font-weight:700}
+h1{font-size:2rem;margin:5px 0 12px}h2{font-size:1.4rem;margin-top:0}
+.sub{color:#526276;margin-bottom:26px}
+label{display:block;font-weight:650;margin:15px 0 6px}
+input{width:100%;padding:12px;border:1px solid #8795a7;border-radius:8px;font:inherit;min-height:46px}
+button{background:#17324d;color:white;border:0;border-radius:8px;padding:13px 18px;min-height:46px;cursor:pointer;font:inherit;font-weight:650;width:100%;margin-top:20px}
+button:disabled{opacity:.65;cursor:wait}
+button.secondary{background:#e8eef3;color:#17324d}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #0f766e;outline-offset:3px}
+.notice:not(:empty){padding:12px 14px;background:#fff8e6;border-left:4px solid #a87116;margin-bottom:16px;overflow-wrap:anywhere}
+.hint,.foot{font-size:.86rem;color:#536477}
+.foot{border-top:1px solid #e1e5ea;margin-top:25px;padding-top:17px}
+#qr{width:202px;height:202px;margin:16px auto;display:flex;align-items:center;justify-content:center}
+#qr img,#qr canvas{max-width:100%;height:auto}
+#setup-key{display:block;word-break:break-all;background:#f1f4f7;padding:12px;border-radius:8px;text-align:center;letter-spacing:.08em}
+#recovery-codes{white-space:pre-wrap;word-break:break-all;background:#f1f4f7;padding:14px;border-radius:8px;font-size:1rem}
+.skip{position:absolute;left:-9999px}.skip:focus{left:8px;top:8px;background:white;padding:12px;z-index:3}
+.password-field{display:flex;align-items:stretch;gap:8px}.password-field input{flex:1;min-width:0}.password-field .password-toggle{width:auto;min-width:76px;margin:0;padding:8px 12px;background:#e8eef3;color:#17324d;border:1px solid #8795a7;border-radius:8px;font-weight:650}.password-field .password-toggle:hover{background:#d8e5ee}
+@media(max-width:550px){.card{margin:0 12px 30px}.top{padding:18px 15px}}

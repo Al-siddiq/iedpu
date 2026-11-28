@@ -30,6 +30,7 @@
                     :title="connectionLabel">
                     <span class="status-dot" aria-hidden="true"></span><span class="connection-label">{{ connectionLabel }}</span>
                 </button>
+                <a class="btn btn-outline-secondary btn-sm topbar-home" href="<?= esc(base_url('administration/invitations'), 'attr') ?>">Invitation workspace</a>
                 <a class="btn btn-outline-secondary btn-sm topbar-home" :href="href('/')" @click.prevent="navigate('/')">Public home</a>
             </div>
         </header>
@@ -49,7 +50,9 @@
                 </nav>
                 <div class="sidebar-notice">
                     <span class="notice-icon" aria-hidden="true"><svg class="bi" aria-hidden="true" focusable="false"><use href="<?= esc(base_url('assets/icons/bootstrap-icons.svg'), 'attr') ?>#info-circle"></use></svg></span>
-                    <p>These are design previews. Member sign-in and administrative functions are not yet available.</p>
+                    <p>These are design previews. Secure sign-in is available only for provisioned test accounts; administrative functions are not yet active.</p>
+                    <p><a href="<?= esc(base_url('sign-in'), 'attr') ?>">Secure sign-in (P2 testing)</a></p>
+                    <p><a href="<?= esc(base_url('constitution/2015'), 'attr') ?>">Read the 2015 Constitution</a> (source-derived reading copy).</p>
                 </div>
             </aside>
 
@@ -68,6 +71,7 @@
                                 <div class="hero-actions">
                                     <a class="btn btn-light btn-lg" :href="href('/preview/member')" @click.prevent="navigate('/preview/member')">Explore member portal <svg class="bi" aria-hidden="true" focusable="false"><use href="<?= esc(base_url('assets/icons/bootstrap-icons.svg'), 'attr') ?>#arrow-right"></use></svg></a>
                                     <a class="hero-text-link" :href="href('/preview/committee')" @click.prevent="navigate('/preview/committee')">See how administration works <svg class="bi" aria-hidden="true" focusable="false"><use href="<?= esc(base_url('assets/icons/bootstrap-icons.svg'), 'attr') ?>#arrow-right"></use></svg></a>
+                                    <a class="hero-text-link" href="<?= esc(base_url('constitution/2015'), 'attr') ?>">Read the 2015 Constitution <svg class="bi" aria-hidden="true" focusable="false"><use href="<?= esc(base_url('assets/icons/bootstrap-icons.svg'), 'attr') ?>#book"></use></svg></a>
                                 </div>
                             </div>
                             <div class="hero-art" aria-hidden="true">

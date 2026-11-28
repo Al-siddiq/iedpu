@@ -120,9 +120,8 @@ class Auth extends ShieldAuth
      * @var array<string, class-string<AuthenticatorInterface>>
      */
     public array $authenticators = [
-        'tokens'  => AccessTokens::class,
+        // Session cookies only. Do not expose token/HMAC authentication paths.
         'session' => Session::class,
-        'hmac'    => HmacSha256::class,
         // 'jwt'     => JWT::class,
     ];
 
@@ -147,9 +146,6 @@ class Auth extends ShieldAuth
      */
     public array $authenticationChain = [
         'session',
-        'tokens',
-        'hmac',
-        // 'jwt',
     ];
 
     /**
@@ -158,7 +154,7 @@ class Auth extends ShieldAuth
      * --------------------------------------------------------------------
      * Determines whether users can register for the site.
      */
-    public bool $allowRegistration = true;
+    public bool $allowRegistration = false;
 
     /**
      * --------------------------------------------------------------------
@@ -182,7 +178,7 @@ class Auth extends ShieldAuth
      * could be modified as the only method of login once an account
      * has been set up.
      */
-    public bool $allowMagicLinkLogins = true;
+    public bool $allowMagicLinkLogins = false;
 
     /**
      * --------------------------------------------------------------------
@@ -209,7 +205,7 @@ class Auth extends ShieldAuth
      */
     public array $sessionConfig = [
         'field'              => 'user',
-        'allowRemembering'   => true,
+        'allowRemembering'   => false,
         'rememberCookieName' => 'remember',
         'rememberLength'     => 30 * DAY,
     ];
@@ -256,9 +252,9 @@ class Auth extends ShieldAuth
      * Minimum Password Length
      * --------------------------------------------------------------------
      * The minimum length that a password must be to be accepted.
-     * Recommended minimum value by NIST = 8 characters.
+     * Owner-selected minimum of 6 characters; shorter than modern security recommendations.
      */
-    public int $minimumPasswordLength = 8;
+    public int $minimumPasswordLength = 6;
 
     /**
      * --------------------------------------------------------------------
@@ -271,12 +267,11 @@ class Auth extends ShieldAuth
      *
      * @var list<class-string<ValidatorInterface>>
      */
-    public array $passwordValidators = [
-        CompositionValidator::class,
-        NothingPersonalValidator::class,
-        DictionaryValidator::class,
-        // PwnedValidator::class,
-    ];
+    // Owner-approved minimum-only policy: letters-only, digits-only or mixed
+    // passwords are accepted. Existing MFA, throttling and session security
+    // remain mandatory for privileged access. Do not silently restore
+    // composition/dictionary restrictions in future account provisioning.
+    public array $passwordValidators = [];
 
     /**
      * --------------------------------------------------------------------

@@ -1,0 +1,7 @@
+:root{color-scheme:light;font-family:system-ui,sans-serif;color:#182337;background:#f4f6f9}
+body{margin:0;padding:3rem 1rem}
+main{box-sizing:border-box;max-width:30rem;margin:0 auto;padding:2rem;background:#fff;border-radius:.75rem;box-shadow:0 4px 24px rgb(0 0 0 / 8%)}
+label{display:block;margin:1rem 0}
+input{display:block;box-sizing:border-box;width:100%;margin-top:.4rem;padding:.75rem}
+button{padding:.8rem 1.5rem;color:#fff;background:#163c72;border:0;border-radius:.3rem;cursor:pointer}
+#status{min-height:2rem}

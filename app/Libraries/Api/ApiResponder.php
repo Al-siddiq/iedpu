@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Libraries\Api;
 
 use CodeIgniter\HTTP\RequestInterface;
+use App\Libraries\Security\RequestId;
 use CodeIgniter\HTTP\ResponseInterface;
 
 /**
@@ -56,10 +57,7 @@ final class ApiResponder
         int $status,
         array $payload
     ): ResponseInterface {
-        $providedId = trim($request->getHeaderLine('X-Request-ID'));
-        $requestId = preg_match('/\A[A-Za-z0-9._-]{8,64}\z/D', $providedId) === 1
-            ? $providedId
-            : bin2hex(random_bytes(16));
+        $requestId = RequestId::current();
 
         $payload['meta'] = [
             'request_id' => $requestId,

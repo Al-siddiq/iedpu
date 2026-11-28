@@ -1,0 +1,28 @@
+name: PHP syntax and identifier smoke
+on:
+  push:
+    branches:
+      - feature/p2-database-auth-governance
+  pull_request:
+    paths:
+      - 'app/**/*.php'
+      - 'scripts/**/*.php'
+      - 'public/assets/**'
+      - '.github/workflows/php-lint.yml'
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP version
+        run: php -v
+      - name: Syntax check
+        run: |
+          set -eu
+          find app scripts -name '*.php' -print0 | xargs -0 -n 1 php -l
+      - name: Identifier normalisation smoke
+        run: php scripts/test-p2-login-identifier.php
+      - name: Invitation release hardening smoke
+        run: php scripts/test-p2-invitation-release-hardening.php
+      - name: Invitation workspace source contract
+        run: php scripts/test-p2-invitation-workspace.php
