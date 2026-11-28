@@ -113,3 +113,12 @@ Manual runbook: [P2_WP02_Password_Change_Acceptance.md](P2_WP02_Password_Change_
 Owner confirmed the previous password-change and password-visibility/six-character usability adjustments work. Added migration 090008 with **empty** token, bound approval intent and one-time bootstrap marker tables; inert 256-bit token codec and canonical approval intent digest; read-only local preflight command. See [Account and Governance Foundations](P2_WP02_Account_Governance_Foundations.md).
 
 This is a schema/security-primitives increment only. **No token is issued or consumed, no delivery/recipient possession is verified, no account is recovered or invited, no initial administrator is provisioned, no approval is executed and no role is assigned.** Existing disabled API fallbacks remain unchanged. Local migration, negative-route regression and preflight acceptance are pending. Production delivery, privileged recovery procedure and owner-designated bootstrap remain holds. PR #3 remains draft.
+
+
+## Invitation browser acceptance — OWNER CONFIRMED (28 November 2026)
+
+The owner completed the eight-step local browser workflow on the disposable `iedpu_disposable_invitation` database: Officer B opened the workspace; Officer A submitted a request for User 2; Officer B independently approved; Officer A issued the invitation and retrieved the local activation token; the recipient activation page successfully activated User 2. See [P2-WP02 Invitation Browser Acceptance](P2_WP02_Invitation_Browser_Acceptance_2026-11-28.md).
+
+**Accepted:** local invitation request UI, independent checker approval UI, maker-only issue UI, local activation-token retrieval and synthetic User 2 activation.
+
+**Not accepted by this result:** production email/inbox delivery, live account provisioning, Committee Super Administrator bootstrap, privileged lost-device/MFA recovery, full protected role/grant CRUD, staging deployment or complete WP02/P2 exit. Local preview is disposable-database-only. Keep PR #3 draft until all WP02/WP03/WP04 exit criteria are met.
