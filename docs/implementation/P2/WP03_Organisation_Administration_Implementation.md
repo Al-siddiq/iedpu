@@ -43,3 +43,10 @@ The project owner confirms that they ran the local manual verification described
 **Evidence boundary:** This records the owner's direct report; no screenshots, local log exports, or execution transcript were supplied with the acceptance message. In particular, the accepted negative-access behaviour of the synthetic zero-permission fixture is **not** evidence of a working privileged administrator role or a successful scoped positive-access workflow.
 
 **Release status unchanged:** WP03 is IN PROGRESS; WP02 outstanding security prerequisites, the protected mutation endpoints, real account bootstrap, approval workflows, cross-scope positive cases, and WP04 remain unaccepted. PR #3 remains draft and must not be merged or deployed to live users based on this increment.
+
+
+## Invitation workspace integration update — local acceptance (28 November 2026)
+
+A protected Invitation Management page is now implemented at `/administration/invitations`, with a top-bar navigation link. It provides the maker request form, independent checker approval/rejection queue, maker's request status and issue action, plus a disposable-database-only local activation-token preview. The owner completed and confirmed the eight-step Officer A / Officer B / User 2 browser acceptance sequence; see [P2-WP02 Invitation Browser Acceptance](P2_WP02_Invitation_Browser_Acceptance_2026-11-28.md).
+
+This closes the invitation UI gap identified during local acceptance. It does **not** complete WP03: zone/branch/office CRUD, scoped role and grant administration, audit search/export, technical workspace, full cross-scope positive/negative matrix and owner acceptance remain outstanding. Production invitation delivery and real Committee Super Administrator provisioning remain separately gated.
