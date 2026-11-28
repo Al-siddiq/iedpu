@@ -53,6 +53,14 @@ $routes->group('api/v1', ['namespace' => 'App\\Controllers\\Api\\V1'], static fu
     // WP03 first increment: authenticated, MFA-verified, permission-scoped
     // READ-ONLY directories. All writes remain disabled by the fallback below.
     $routes->get('administration/directory/(:segment)', 'DirectoryController::show/$1');
+    // P3-WP03-A: branch management; controller and service independently enforce MFA and branches.manage.
+    $routes->get('administration/branches', 'BranchAdministrationWorkspace::index');
+    $routes->get('administration/branches/data', 'BranchAdministrationController::index');
+    $routes->post('administration/branches', 'BranchAdministrationController::create');
+    $routes->put('administration/branches/(:num)', 'BranchAdministrationController::update/$1');
+    $routes->post('administration/branches/(:num)/activate', 'BranchAdministrationController::activate/$1');
+    $routes->post('administration/branches/(:num)/deactivate', 'BranchAdministrationController::deactivate/$1');
+    $routes->get('administration/branches/(:num)/history', 'BranchAdministrationController::history/$1');
 
     // P2+ functions are deliberately unavailable. No temporary public CRUD,
     // membership enrolment, administrator or developer privilege is exposed.
