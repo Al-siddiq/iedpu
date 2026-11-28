@@ -31,6 +31,7 @@
                     <span class="status-dot" aria-hidden="true"></span><span class="connection-label">{{ connectionLabel }}</span>
                 </button>
                 <a class="btn btn-outline-secondary btn-sm topbar-home" href="<?= esc(base_url('administration/invitations'), 'attr') ?>">Invitation workspace</a>
+                <a class="btn btn-outline-secondary btn-sm topbar-home" href="<?= esc(base_url('administration/branches'), 'attr') ?>">Branch management</a>
                 <a class="btn btn-outline-secondary btn-sm topbar-home" :href="href('/')" @click.prevent="navigate('/')">Public home</a>
             </div>
         </header>
