@@ -118,7 +118,8 @@ final class BranchDirectoryManager
 
     public function setStatus(int $actor,int $branchId,bool $activate,string $reason,string $reference=''): void
     {
-        $this->authorise($actor);
+        $permission=$activate?'branches.activate':'branches.manage';
+        if (!(new ScopeAuthorizer($this->db))->allows($actor,$permission,'global')) throw new RuntimeException('Branch status change is not authorised.');
         $reason=trim($reason);
         if ($branchId<1||$reason===''||strlen($reason)>500) throw new RuntimeException('A branch and reason are required.');
         $this->db->transBegin();
